@@ -60,40 +60,5 @@ object InstitutionServerExample extends InstitutionRESTServer(new ResourceProtoc
 }
   
   
-  /*
-   * 
-   * 
-   * /**
-* Example Custom Server
-*/
-object InstitutionServerExample extends InstitutionRESTServer(new ResourceProtocolStore("/protocols")) with Asking{
-val console = new StdInInstitutionConsole {} 
 
-//This is where you make your state store with database connection etc.
-def special_store() : StateStore = ??? //new SlickStateStore ....
-
-//Create a new factory that will make agent environments using your store
-//Give it a name and a description
-val factory = new DefaultInstitutionFactory("my_factory","Special institution factory that adds State Stores") {
- //when it makes an environment factory, make a special one
- override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
-   new SimpleEnvironmentFactory(manager.protocols) {
-     //When you create an agent environment, make a special one
-     override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] = 
-       //make the special environment by swapping in the new special store
-       super[SimpleEnvironmentFactory].handle(spec,extra) map {v => v(special_store())}
- }
-}
-
-//Register your factory
-manager.register(factory)
-//Now start an institution that uses your factory by passing in Some(<name of factory>)
-manager.start_institution("default institution",Some("my_factory")).now map console.set_institution
-console.run_in_background
-}
-   * 
-   * 
-   * 
-   * 
-   * */
 
