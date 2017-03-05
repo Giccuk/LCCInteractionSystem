@@ -1,0 +1,19 @@
+a(host,H)::=
+	hello(G)=>a(guest,G)<--friend(G)
+	then
+	hey<=a(guest,G)
+	then
+	ask(V)=>a(guest,G)<--e(interested(V))
+	then
+	offer(D,V)<=a(guest,G)
+	then
+	k(getfrom(D,G)).
+
+a(guest,G)::=
+	hello(_)<=a(host,H)
+	then
+	hey=>a(host,H)<--e(nice(H))
+	then 
+	ask(V)<=a(host,H)
+	then
+	offer(D,V)=>a(host,H)<--e(sell(D)).

@@ -1,0 +1,5 @@
+a(investor(10,3,b),a).
+a(trustee(3,a),b).
+
+known(a,invest(2)).
+known(b,repay(1)).

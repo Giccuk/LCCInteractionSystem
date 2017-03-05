@@ -1,0 +1,42 @@
+a( seller, C ) ::
+  want(T) <= a(interested(C),I)
+  then ( (
+    	sell(T) => a(interested(C),I) <-- got(T)
+    	then k( sold(T,I) )
+    ) or
+    not_got(T) => a(interested(C),I)
+  )
+  then a( seller, C) .
+
+a( interested(C), I ) ::
+  want(T) => a(seller,C) <-- e(want(T),_)
+  then
+  (
+    k(got(T)) <-- sell(T) <= a(seller,C) 
+    or
+    k(not_got(T)) <-- not_got(T) <= a(seller,C)
+  ).
+
+a( swapper(C), S ) ::
+  swap(T,O) => a( swapshop, C ) <-- e(want_swap(T,O))
+  then
+  k(can_swap(T,O,X)) <- got_swap(T,O,X) <= a( swapshop, C )
+  .
+  
+a( swapshop, C ) ::
+(
+  swap(T,O) <= a( swapper(_), S )
+  then
+  (
+    (
+      retractall(wants_swap(O,T,X)) <- i(wants_swap(O,T,X))
+      then got_swap(T,O,X) => a(swapper(C),S)
+      then got_swap(O,T,S) => a(swapper(C),X)
+    ) or (
+      null <- debug("Doesn't want swap",O,T,X) then
+      k(wants_swap(T,O,S))
+    )
+  )
+) then
+a( swapshop, C ).
+  

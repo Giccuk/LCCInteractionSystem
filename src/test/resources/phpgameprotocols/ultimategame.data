@@ -1,0 +1,5 @@
+a(proposer(10), p).
+a(responder(10), r).
+
+known(p,offernum(2,r)).
+known(r,acceptornot(reject,2)).

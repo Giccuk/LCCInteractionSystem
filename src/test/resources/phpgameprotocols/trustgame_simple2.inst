@@ -1,0 +1,16 @@
+a(investor(Total,Rate,T), I)::=
+ invest(X)=>a(trustee(Rate,I), T)<--e(invest(X, T), _)
+ then
+ repay(Y)<=a(trustee(Rate,I),T)
+ then
+ k(own(Pi))<--i(Pi is Total+(Y-X)).
+ 
+ 
+a(trustee(Rate,I),T)::=
+ invest(X)<=a(investor(_,Rate,T),I)
+ then
+ k(get(Wi))<--i(Wi is X*Rate)
+ then
+ repay(Y)=>a(investor(_,Rate,T),I)<--e(repay(Y, I), _)
+ then
+ k(own(Pt))<--i(Pt is Wi-Y).

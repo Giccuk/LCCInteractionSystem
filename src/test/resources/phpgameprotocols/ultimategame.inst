@@ -1,0 +1,11 @@
+a(proposer(Total),P)::=
+ offer(X)=>a(responder(Total),R)<-e(offernum(X, R), _)
+ then
+ decide(D,X)<=a(responder(Total),R)
+ then
+ k(fair(D,X,Total,R)).
+ 
+a(responder(Total),R)::=
+ offer(X)<=a(proposer(Total),P)
+ then
+ decide(D,X)=>a(proposer(Total),P)<-e(acceptornot(D, X), _).

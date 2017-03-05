@@ -1,0 +1,9 @@
+a(firstone(25),q).
+%a(secondone(30),b).
+a(thirdone(40),c).
+a(fourthone(10),d).
+
+known(c,fri(q)).
+known(q,fri(b)).
+known(d,fri(q)).
+%known(b,not_fair(20)).

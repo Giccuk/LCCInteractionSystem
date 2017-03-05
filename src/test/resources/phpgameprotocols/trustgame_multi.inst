@@ -1,0 +1,4 @@
+a(coordinator(PeopleNum),C)::=
+a(monitor(GroupNum),C)<--i(GroupNum is PeopleNum/2).
+
+a(monitor(GroupNum),M)

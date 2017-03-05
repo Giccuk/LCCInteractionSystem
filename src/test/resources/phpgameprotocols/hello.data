@@ -1,0 +1,9 @@
+a(host,hos).
+%a(secondone(30),b).
+a(guest,ges).
+
+known(hos,friend(ges), _).
+%known(ges,nice(hos)).
+%known(q,fri(b)).
+%known(d,fri(q)).
+%known(b,not_fair(20)).

@@ -1,0 +1,9 @@
+a(host,H)::=
+	hello=>a(guest,G)<--e(friend(G), _)
+	then
+	hey<=a(guest,G).
+
+a(guest,G)::=
+	hello<=a(host,H)
+	then
+	hey=>a(host,H)<--e(nice(H), _).

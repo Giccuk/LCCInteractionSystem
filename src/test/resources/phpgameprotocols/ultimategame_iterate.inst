@@ -1,0 +1,26 @@
+%I=increment
+%L= lowest acceptable amount for responder 
+
+a(proposer(X,Total,I,R), P ) ::=
+ offer(X,Total)=>a(responder(P), R)
+ then
+ (
+   k(accept(X,Total,R)) <--accept<=a(responder(P), R)
+ ) 
+ or
+ (
+   k(reject(X,Total,R)) <--reject<=a(responder(P), R)
+   then
+   a(proposer(Xn,Total,I,R),P) <- Xn is X+I
+ ).
+ 
+a(responder(P), R) ::=
+ offer(X,Total)<=a(proposer(X,Total,I,R), P)
+ then
+ accept=>a(proposer(X,Total,I,R), P)<-- e(fair(X,Total))
+ or 
+ (
+ 	reject=>a(proposer(X,Total,I,R), P)
+ 	then
+ 	a(responder(P),R)
+ ).

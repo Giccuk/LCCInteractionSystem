@@ -1,0 +1,7 @@
+
+a(proposer(10,100, r), p).
+a(responder(p), r).
+
+known(r, not_fair(10,100)).
+
+

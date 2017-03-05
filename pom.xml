@@ -1,0 +1,236 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <!-- basic -->
+  <groupId>re.cc</groupId>
+  <artifactId>LCCInteractionSystem</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <properties>
+    <scala.version>2.11.7</scala.version>
+  </properties>
+  <build>
+    <sourceDirectory>src/main/scala</sourceDirectory>
+    <testSourceDirectory>src/test/scala</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <!-- disable surefire -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+      <!-- enable scalatest -->
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+          <junitxml>.</junitxml>
+          <filereports>WDF TestSuite.txt</filereports>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- new plugins head-->
+    	<plugin>
+    		<groupId>net.alchim31.maven</groupId>
+        	<artifactId>scala-maven-plugin</artifactId>
+        	<version>3.2.1</version><!--$NO-MVN-MAN-VER$-->
+        	<configuration>
+				<excludes>
+					<exclude>**/SoftInstitutionDualTest.scala</exclude>
+				</excludes>
+			</configuration>
+    	</plugin>
+    	<plugin>
+        	<groupId>org.apache.maven.plugins</groupId>
+        	<artifactId>maven-dependency-plugin</artifactId>
+    	</plugin>
+	<!-- new plugins end -->
+    </plugins>
+  </build>
+
+  <dependencies>
+     <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>2.11.7</version>
+    </dependency>
+    
+    <dependency>
+    	<groupId>com.moseph</groupId>
+		<artifactId>scalsc</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+    <!--new dependencies head -->
+	<dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>finatra-http_2.11</artifactId>
+    	<version>2.2.0</version>
+	</dependency>
+	<dependency>
+		<groupId>com.twitter</groupId>
+		<artifactId>finatra-http_2.11</artifactId>
+		<scope>test</scope>
+		<type>test-jar</type>
+		<version>2.2.0</version>
+	</dependency>
+
+	<!--<dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>finatra-jackson_2.11</artifactId>
+    	<version>2.2.0</version>
+	</dependency>
+	<dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>finatra-jackson_2.11</artifactId>
+		<scope>test</scope>
+		<type>test-jar</type>
+    	<version>2.2.0</version>
+	</dependency>-->
+    
+	<dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>inject-server_2.11</artifactId>
+		<scope>test</scope>
+		<type>test-jar</type>
+    	<version>2.2.0</version>
+	</dependency>
+	<dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>inject-app_2.11</artifactId>
+		<scope>test</scope>
+		<type>test-jar</type>
+    	<version>2.2.0</version>
+	</dependency>
+	<dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>inject-core_2.11</artifactId>
+		<scope>test</scope>
+		<type>test-jar</type>
+    	<version>2.2.0</version>
+	</dependency>
+	<dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>inject-modules_2.11</artifactId>
+		<scope>test</scope>
+		<type>test-jar</type>
+    	<version>2.2.0</version>
+	</dependency>
+
+	<!-- <dependency>
+    	<groupId>com.google.inject.extensions</groupId>
+    	<artifactId>guice-testlib</artifactId>
+		<scope>test</scope>
+		<type>test-jar</type>
+    	<version>4.0</version>
+	</dependency>-->
+
+	<dependency>
+    	<groupId>org.scalactic</groupId>
+    	<artifactId>scalactic_2.11</artifactId>
+    	<version>3.0.1</version>
+	</dependency>
+	
+   <dependency>
+    	<groupId>org.scalatest</groupId>
+    	<artifactId>scalatest_2.11</artifactId>
+    	<version>2.2.4</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.specs2</groupId>
+	    <artifactId>specs2_2.11</artifactId>
+		<scope>test</scope>
+	    <version>2.3.12</version>
+	</dependency>
+	<!--<dependency>
+    		<groupId>com.twitter.common</groupId>
+    		<artifactId>util</artifactId>
+    		<version>0.0.121</version>
+	</dependency>
+	<dependency>
+    		<groupId>com.twitter.common</groupId>
+    		<artifactId>stats-util</artifactId>
+   			<version>0.0.59</version>
+	</dependency>
+	<dependency>
+    		<groupId>com.twitter.common</groupId>
+    		<artifactId>metrics</artifactId>
+    		<version>0.0.38</version>
+	</dependency>
+	<dependency>
+    	<groupId>org.json4s</groupId>
+    	<artifactId>json4s-scalaz_2.11</artifactId>
+    	<scope>test</scope>
+        <version>3.5.0</version>
+	</dependency>
+    <dependency>
+    	<groupId>org.json4s</groupId>
+    	<artifactId>json4s-native_2.11</artifactId>
+    	<version>3.5.0</version>
+	</dependency>-->
+	<dependency>
+    	<groupId>org.apache.maven.plugins</groupId>
+    	<artifactId>maven-help-plugin</artifactId>
+    	<version>2.2</version>
+	</dependency>	
+	
+  <dependency>
+    <groupId>com.moseph</groupId>
+  	<artifactId>scalsc-slick</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+  </dependency>
+   <!-- new dependencies end -->
+   
+  </dependencies>
+<!--new depository head-->
+  <repositories>
+	<repository>
+		<id>Twitter Maven</id>
+		<url>https://maven.twttr.com</url>
+	</repository>
+	<repository>
+		<id>Finatra Repo</id>
+		<url>http://twitter.github.com/finatra</url>
+	</repository>
+	<repository>
+        <id>artima</id>
+        <name>Artima Maven Repository</name>
+        <url>http://repo.artima.com/releases</url>
+    </repository>
+  </repositories>
+ 
+  
+<!--new depository end-->
+
+</project>
+ 

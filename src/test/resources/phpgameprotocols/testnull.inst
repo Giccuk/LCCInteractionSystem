@@ -1,0 +1,48 @@
+a(firstone(Pa),A)::=
+    (
+		offer(X)<=a(fourthone(_),D)
+		then
+		fine=>a(fourthone(_),D)<-- Pa>0
+		or
+  	    deny=>a(fourthone(_),D)  
+    )
+%   then
+%    (
+%    	offer(Pa)=>a(secondone(_),B)<--Pa>0 and fri(B)
+%		then		
+%		ok<=a(secondone(_),B)
+%		or
+%		no<=a(secondone(_),B)
+%	)
+	or
+	(
+		offer(X)<=a(thirdone(_),C)
+		then
+		accept=>a(thirdone(_),C)<-- Pa>0
+		or
+ 	    reject=>a(thirdone(_),C)
+    ).
+
+a(secondone(Pb),B)::=
+offer(X)<=a(firstone(_),A)
+then
+(
+no=>a(firstone(_),A)<--not_fair(X)
+or
+ok(Pb)=>a(firstone(_),A)<--fair(X)
+).
+
+a(thirdone(Pc),C)::=
+offer(Pc)=>a(firstone(_),A)<--Pc<50 and fri(A)
+then
+accept<=a(firstone(_),A)
+or
+reject<=a(firstone(_),A).
+
+a(fourthone(Pd), D)::=
+offer(Pd)=>a(firstone(_),A)<--Pd<50 and fri(A)
+then
+fine<=a(firstone(_),A)
+or
+deny<=a(firstone(_),A).
+

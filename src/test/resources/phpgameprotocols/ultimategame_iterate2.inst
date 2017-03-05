@@ -1,0 +1,25 @@
+%I=increment
+
+a(proposer(X,Total,I,Rs), P ) ::=
+  offer(X,Total)=>a(responder(P), R)<-Rs=[R|Rr]
+  then
+  (
+   accept<=a(responder(P), R)
+   then 
+   k(accept(X,Total,R))
+  ) 
+  or
+  (
+   reject<=a(responder(P), R)
+   then
+   k(reject(X,Total,R))
+  )
+   then
+   a(proposer(X,Total,I,Rr),P).
+ 
+a(responder(P), R) ::=
+ offer(X,Total)<=a(proposer(X,Total,I,Rs), P)
+ then
+ accept=>a(proposer(X,Total,I,Rs), P)<-fair(X,Total)
+ or 
+ reject=>a(proposer(X,Total,I,Rs), P)<-not_fair(X,Total).

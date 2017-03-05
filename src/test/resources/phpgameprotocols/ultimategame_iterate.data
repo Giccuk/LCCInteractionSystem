@@ -1,0 +1,5 @@
+a(proposer(40,100,10,b), a).
+a(responder(a), b).
+
+known(b, fair(60,100)).
+

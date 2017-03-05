@@ -1,0 +1,7 @@
+a(proposer(60,100, richard), peter).
+a(responder(peter),richard).
+
+known(richard, fair(60,100)).
+
+
+
