@@ -37,9 +37,7 @@ import com.moseph.scalsc.server._
 
 object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   val console = new StdInInstitutionConsole {} 
-//  manager.start_institution("default").now map console.set_institution  
-//console.run_in_background
- 
+
   def gameagent_statestore(url:String,driver:String): StateStore=new SlickStateStore(){}
   
   val gameinstitution_factory = new DefaultInstitutionFactory("gameexperiment_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one   
