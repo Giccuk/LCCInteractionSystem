@@ -35,28 +35,12 @@ import com.moseph.scalsc.slick._
 import com.moseph.scalsc.environment._
 import com.moseph.scalsc.server._
 
-object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
+object GameServerSimple extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   val console = new StdInInstitutionConsole {} 
-
-  def gameagent_statestore(url:String,driver:String): StateStore=new SlickStateStore(){}
-  
-  val gameinstitution_factory = new DefaultInstitutionFactory("gameexperiment_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one   
-     override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory = 
-       new SimpleEnvironmentFactory(manager.protocols) {//When you create an agent environment, make a special one  
-         override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] = 
-           super[SimpleEnvironmentFactory].handle(spec,extra) map {s => s(gameagent_statestore("jdbc:h2:./db/test","org.h2.Driver"))} //make the special environment by swapping in the new special store 
-       }
-  }
-  
-  //Register your factory  
-  manager.register(gameinstitution_factory)  
-  //Now start an institution that uses your factory by passing in Some(<name of factory>) 
-  manager.start_institution("default",Some("gameexperiment_factory")).now map console.set_institution
+  manager.start_institution("default").now map console.set_institution  
   console.run_in_background
   
-  }
-
-
+}
   
   
 
