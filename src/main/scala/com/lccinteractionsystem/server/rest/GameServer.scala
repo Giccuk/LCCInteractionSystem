@@ -35,10 +35,11 @@ import com.moseph.scalsc.slick._
 import com.moseph.scalsc.environment._
 import com.moseph.scalsc.server._
 
+
 object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   val console = new StdInInstitutionConsole {}
 
-  def game_statestore: StateStore=new SlickStateStore("jdbc:h2:./db/test3","org.h2.Driver"){}
+  def game_statestore: StateStore=new MysqlSlickStateStore
 
   val game_factory = new DefaultInstitutionFactory("game_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
      override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
@@ -53,8 +54,6 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
   //Now start an institution that uses your factory by passing in Some(<name of factory>)
   manager.start_institution("default",Some("game_factory")).now map console.set_institution
   console.run_in_background  
-  
-  game_statestore.get_state_info(Some("peter"))
-  
+   
 }
 

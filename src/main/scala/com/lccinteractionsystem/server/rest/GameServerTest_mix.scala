@@ -40,24 +40,38 @@ import com.moseph.scalsc.server._
 object GameServerTest_mix extends agentInstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   val console = new StdInInstitutionConsole {}
 
-  def game_statestore_slick: StateStore=new SlickStateStore("jdbc:h2:./db/test3","org.h2.Driver"){}
+  def gamestatestore: StateStore=new MysqlSlickStateStore
 
   val game_factory = new DefaultInstitutionFactory("game_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
      override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
        new SimpleEnvironmentFactory(manager.protocols) {//When you create an agent environment, make a special one
          override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] =
-           super[SimpleEnvironmentFactory].handle(spec,extra).map(s => s(game_statestore_slick)) //make the special environment by swapping in the new special store
+           super[SimpleEnvironmentFactory].handle(spec,extra).map(s => s(gamestatestore)) //make the special environment by swapping in the new special store
        }
   }
 
-  //Register your factory
+  //Register new factory
   manager.register(game_factory)
-  //Now start an institution that uses your factory by passing in Some(<name of factory>)
+  //Start an institution that uses your factory by passing in Some(<name of factory>)
   manager.start_institution("default",Some("game_factory")).now map console.set_institution
   console.run_in_background  
-
-
   
+  val game_store=new MysqlSlickStateStore
+  
+  val gamedb=game_store.db
+  
+  game_store.init
+  
+  game_store.clear_states
+
+  val s=StringState("peter","a(proposer,peter)","gameprotocol","msg_in","msg_out","wait")
+  
+  game_store.store_serialised(s)
+  
+  println("begin")
+  val gamestate=game_store.get_state_info(Some("peter"))
+  
+  //gamedb.close() 
   
 }
 
@@ -106,9 +120,6 @@ class AgentManagement_slick extends Controller with ControllerHandlesToJSON {
     system.actorSelection(request.params("*")).resolveOne map { a =>
       AkkaAgentHandle(a).inject_elicitation(elicitation.to_lsc)
     }
-    println("++++++++++++++++++++++++++++")
-    println(GameServerTest_mix.game_statestore_slick.get_state_info(Some("peter")))
-    println("----------------------------")
   }
 
   //Asks the agent to compute the given predicate and return the result
