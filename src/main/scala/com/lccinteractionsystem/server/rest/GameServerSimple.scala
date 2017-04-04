@@ -31,9 +31,9 @@ import com.moseph.scalsc.server.DefaultInstitutionDef
 import com.moseph.scalsc.server.AgentTemplate
 import com.moseph.scalsc.server.rest._
 
-import com.moseph.scalsc.slick._
-import com.moseph.scalsc.environment._
-import com.moseph.scalsc.server._
+//import com.moseph.scalsc.slick._
+//import com.moseph.scalsc.environment._
+//import com.moseph.scalsc.server._
 
 object GameServerSimple extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   val console = new StdInInstitutionConsole {} 
