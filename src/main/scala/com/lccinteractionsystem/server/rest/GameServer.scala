@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.server.rest
+/*package com.lccinteractionsystem.server.rest
 
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.Controller
@@ -57,3 +57,4 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
    
 }
 
+*/
