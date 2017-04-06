@@ -34,7 +34,7 @@
         $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
         preg_match($pattern,$subject,$matches);
         if ($matches[1]==$institutionname){//institution is created successfully
-          header("Location:http://localhost/phpserver/ultimategame/proposerside/proposerform.php");
+          header("Location:http://{$serveraddress}/phpserver/ultimategame/proposerside/proposerform.php");
         }
         else{
           echo "Failed to create the game institution *_*<br><br>";
@@ -77,11 +77,11 @@
 
               $keydata=array("interid"=>$interactionid_responderside);
               $keydata_json=json_encode($keydata);
-              $fp=fopen('/Applications/XAMPP/htdocs/phpserver/ultimategame/responderside/responderinfo.json','w' );
+              $fp=fopen('{$sourcefiledir}/phpserver/ultimategame/responderside/responderinfo.json','w' );
               fwrite($fp, $keydata_json);
               fclose($fp);
 
-              header("Location:http://localhost/phpserver/ultimategame/responderside/responderform.php");
+              header("Location:http://{$serveraddress}/phpserver/ultimategame/responderside/responderform.php");
             }
             else{
               echo "Failed to create the second agent. *_*<br><br>";
