@@ -71,7 +71,7 @@ object GameServerTest_mix extends agentInstitutionRESTServer(new ResourceProtoco
   println("begin")
   val gamestate=game_store.get_state_info(Some("peter"))
   
-  //gamedb.close() 
+  gamedb.close() 
   
 }
 
