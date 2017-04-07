@@ -1,4 +1,4 @@
-/*package com.lccinteractionsystem.server.rest
+package com.lccinteractionsystem.server.rest
 
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.Controller
@@ -159,5 +159,5 @@ class AgentManagement_slick extends Controller with ControllerHandlesToJSON {
     def to_lsc = LSCParserHelpers.e(elicit)
   }
 }
-*/
+
 
