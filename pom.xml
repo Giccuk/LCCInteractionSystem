@@ -106,19 +106,6 @@
 		<version>2.2.0</version>
 	</dependency>
 
-	<!--<dependency>
-    	<groupId>com.twitter</groupId>
-    	<artifactId>finatra-jackson_2.11</artifactId>
-    	<version>2.2.0</version>
-	</dependency>
-	<dependency>
-    	<groupId>com.twitter</groupId>
-    	<artifactId>finatra-jackson_2.11</artifactId>
-		<scope>test</scope>
-		<type>test-jar</type>
-    	<version>2.2.0</version>
-	</dependency>-->
-
 	<dependency>
     	<groupId>com.twitter</groupId>
     	<artifactId>inject-server_2.11</artifactId>
@@ -147,14 +134,6 @@
 		<type>test-jar</type>
     	<version>2.2.0</version>
 	</dependency>
-
-	<!-- <dependency>
-    	<groupId>com.google.inject.extensions</groupId>
-    	<artifactId>guice-testlib</artifactId>
-		<scope>test</scope>
-		<type>test-jar</type>
-    	<version>4.0</version>
-	</dependency>-->
 
 	<dependency>
     	<groupId>org.scalactic</groupId>
@@ -210,6 +189,12 @@
   	<artifactId>scalsc-slick</artifactId>
   	<version>0.0.1-SNAPSHOT</version>
   </dependency>
+  
+  <dependency>
+    <groupId>com.typesafe.slick</groupId>
+    <artifactId>slick-hikaricp_2.11</artifactId>
+    <version>3.2.0</version>
+</dependency>
    <!-- new dependencies end -->
 
   </dependencies>
