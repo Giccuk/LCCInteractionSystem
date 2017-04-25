@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.server.rest
+package com.lccinteractionsystem.server.mysql
 
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.Controller
@@ -33,56 +33,65 @@ import com.moseph.scalsc.server.rest._
 import com.moseph.scalsc.slick._
 import com.moseph.scalsc.environment._
 import com.moseph.scalsc.server._
-import com.moseph.scalsc.slick.h2.H2SlickStateStore
+import com.moseph.scalsc.slick.mysql.MysqlSlickStateStoreURL
 import scala.concurrent.duration._
 
-
-/**
- * Example game server created by DMR that uses a custom state store,
- * and demonstrates what is in it before and after running the protocol
- */
-object ExampleGameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
-  def store_url = "jdbc:h2:./db/test"
-
+object MysqlStateSlick_Test extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
+  
+  val dbconfig="jdbc:mysql://localhost:3306/lccgame"
   //Create a game institution factory
-  val game_factory = new GameInstitutionFactory("game_factory",store_url)
+  val gameInstitution_factory = new GameInstitutionFactory_mysql("gameInstitution_factory",dbconfig)
   
-  /* The next few lines are just for testing, and showing what is happening */
+  /***************************************************************************
+   *    
+   * The next few lines are just for testing, and showing what is happening 
+   ****************************************************************************/
+  println("test+++++++++++++++++++++++++++++\n")
   //This is a store we'll use to test whether states are present before and after starting the interaction
-  val store = game_factory.create_store("test_store")
-  
+  val store = gameInstitution_factory.create_store("test_store")
+
   //Need to put the store into an environment so that it works
   val env_builder = new EnvironmentBuilder(protocols=protocols)(store).mock()
 
   //What states were left over from the previous run?
   System.err.println("States before the run:\n=>"+store.get_all_states().mkString("\n=>"))
-  /* End testing block */
+  println("test------------------------------\n")
+  /**************************
+   * End testing block
+   **************************/
 
-  //Start a console to interact with the agents if we want to
+  //Start a console to interact with the agents if we want to 
+  println("Insitution+++++++++++++++++++++++++++++\n")
   val console = new StdInInstitutionConsole {}
-  //Register the factory
-  manager.register(game_factory)
   
+  //Register the factory
+  manager.register(gameInstitution_factory)
 
   //Now start an institution that uses the factory by passing in Some(<name of factory>)
-  val institution = manager.start_institution("default",Some("game_factory")).now.get
+  val institution = manager.start_institution("default",Some("gameInstitution_factory")).now.get
   System.err.println("Created Institution!")
   console.set_institution(institution)
-
-  /* At this point, there is an institution, but nothing is actually happening, so we start an interaction */
-  
+  println("Insitution------------------------------\n")
+  /***********************************************************************************************************
+   * 
+   *  At this point, there is an institution, but nothing is actually happening, so we start an interaction  
+   ************************************************************************************************************/
+  println("Interaction+++++++++++++++++++++++++++++\n")
   //Start an interaction, with an agent playing proposer
-  val interaction = institution.start_interaction(
-      InteractionTemplate("ultimategame_iterate").with_agent("kev","proposer(5,10,i,r)"),
-      NoData,"test_interaction_id").now.get
-  console.set_interaction(interaction)
+  val interaction =institution.start_interaction(
+      InteractionTemplate("ultimategame").with_agent("kev","proposer(10)"),
+      NoData,
+      "test_interaction_id"
+  ).now.get
 
+  console.set_interaction(interaction)
+  System.err.println("First :\n=>"+store.get_all_states().mkString("\n=>"))
   //Start another agent just as an example
-  val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(5,10,i,r)"),None).now.get
+  val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(10)"),None).now.get
   console.set_agent(agent)
-  
+
   console.run_in_background  
-  
+  System.err.println("before Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
   //Kick everything off, and then we'll see what's happened
   DelayedFuture( 3 seconds )({
     System.err.println("Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
@@ -92,8 +101,9 @@ object ExampleGameServer extends InstitutionRESTServer(new ResourceProtocolStore
    
 }
 
+
 //An InstitutionFactory that will use the Slick state store
-class GameInstitutionFactory(id:String,store_url:String) 
+class GameInstitutionFactory_mysql(id:String,db_config:String) 
   extends DefaultInstitutionFactory(id, "Game institution factory that uses Slick to store agent states") { 
   //when it makes an environment factory, make a special one
   override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
@@ -124,9 +134,9 @@ class GameInstitutionFactory(id:String,store_url:String)
   //This is the function we're going to use for creating a game state store
   //Uses the agent ID just for debugging
   def create_store(id:String): SlickStateStore= {
-    val store = new H2SlickStateStore(store_url)
+    val store = new MysqlSlickStateStoreURL(db_config)
     System.err.println(s"Creating a new state store for agent $id")
-    store.init
+    store.init //connect to a database and table named "scalsc_states"
     store
   }
 

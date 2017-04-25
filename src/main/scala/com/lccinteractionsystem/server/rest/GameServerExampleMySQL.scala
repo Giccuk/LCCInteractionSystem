@@ -33,7 +33,7 @@ import com.moseph.scalsc.server.rest._
 import com.moseph.scalsc.slick._
 import com.moseph.scalsc.environment._
 import com.moseph.scalsc.server._
-import com.moseph.scalsc.slick.mysql.MysqlSlickStateStore
+import com.moseph.scalsc.slick.mysql._
 import scala.concurrent.duration._
 
 
@@ -43,10 +43,10 @@ import scala.concurrent.duration._
  */
 object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   
-  val dbconfig="gamedb"
+  val dburl="jdbc:mysql://localhost:3306/lccgame"
 
   //Create a game institution factory
-  val gameInstitutin_factory = new GameInstitutionFactory_mysql("gameInstitutin_factory",dbconfig)
+  val gameInstitutin_factory = new GameInstitutionFactory_mysql("gameInstitutin_factory",dburl)
   
   /***************************************************************************
    *    
@@ -85,12 +85,12 @@ object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocol
   println("Interaction+++++++++++++++++++++++++++++\n")
   //Start an interaction, with an agent playing proposer
   val interaction = institution.start_interaction(
-      InteractionTemplate("ultimategame").with_agent("kev","proposer(10,p)"),
+      InteractionTemplate("ultimategame").with_agent("kev","proposer(10)"),
       NoData,"test_interaction_id").now.get
   console.set_interaction(interaction)
 
   //Start another agent just as an example
-  val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(5,10,i,r)"),None).now.get
+  val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(10)"),None).now.get
   console.set_agent(agent)
 
   console.run_in_background  
@@ -137,7 +137,7 @@ class GameInstitutionFactory_mysql(id:String,db_config:String)
   //This is the function we're going to use for creating a game state store
   //Uses the agent ID just for debugging
   def create_store(id:String): SlickStateStore= {
-    val store = new MysqlSlickStateStore(db_config)
+    val store = new MysqlSlickStateStoreURL(db_config)
     System.err.println(s"Creating a new state store for agent $id")
     store.init //connect to a database and table named "scalsc_states"
     store
