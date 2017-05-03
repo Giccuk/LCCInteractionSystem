@@ -39,14 +39,13 @@ class UltimateGameTest extends FeatureTest with Mockito {
   }
   gameserver.manager.register(game_factory)
   //Now start an institution that uses your factory by passing in Some(<name of factory>)
-  //val inst=gameserver.manager.start_institution("default",Some("game_factory")).now.get 
-  //console.set_institution(inst)
+  gameserver.manager.start_institution("game_institution",Some("game_factory"))
   //console.run_in_background 
   
   
   "Server Setup" in {
     //0.Should start with no institutions at all
-    server.httpGet(
+    /*server.httpGet(
         path="/institutions",
         andExpect = Ok,
         withJsonBody = "[]"
@@ -70,7 +69,7 @@ class UltimateGameTest extends FeatureTest with Mockito {
           "type":"institution", 
           "path":"http://localhost:8888/institution/user/manager/game_institution" 
           } """
-    )
+    )*/
     //2.get the information about institution
     server.httpGet(
         path="/institutions",
@@ -203,7 +202,7 @@ class UltimateGameTest extends FeatureTest with Mockito {
             )
 
     //hos is waiting for something to fill in e(friend(G)) ,so we supply it
-    server.httpPost(
+  /*  server.httpPost(
         path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/peter",
         postBody="""
         {"elicited":"e(offernum(2, richard), _)"} 
@@ -220,16 +219,16 @@ class UltimateGameTest extends FeatureTest with Mockito {
           {
             "type":"agent",
             "path":"$richard_path",
-            "next_steps": ["e(acceptorno(D, X), _)"]
+            "next_steps": ["e(acceptornot(D, X), _)"]
           }
           """
     )
 
     //peter is waiting for something to fill in
-    /*server.httpPost(
+    server.httpPost(
         path=richard_path,
         postBody="""
-        {"elicited":"e(acceptornot(reject, 2), _)"} 
+        {"elicited":"e(acceptorno(reject, 2), _)"} 
         """,
         andExpect = Ok
         )
