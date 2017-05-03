@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.protocol_tests
+package com.lccinteractionsystem.protocol
 
 import com.moseph.scalsc.environment._
 import com.moseph.scalsc.artifacts._

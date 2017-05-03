@@ -34,15 +34,16 @@ import com.moseph.scalsc.server.rest._
 import com.moseph.scalsc.slick._
 import com.moseph.scalsc.environment._
 import com.moseph.scalsc.server._
-import com.moseph.scalsc.slick.mysql.MysqlSlickStateStore
+import com.moseph.scalsc.slick.mysql.MysqlSlickStateStoreURL
 
 
 
-object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
+object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking {
   val console = new StdInInstitutionConsole {}
 
-  def game_statestore: StateStore=new MysqlSlickStateStore("gamedb")
-
+  def game_statestore: SlickStateStore=new MysqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame")
+  game_statestore.init
+  
   val game_factory = new DefaultInstitutionFactory("game_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
      override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
        new SimpleEnvironmentFactory(manager.protocols) {//When you create an agent environment, make a special one
@@ -50,12 +51,54 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
            super[SimpleEnvironmentFactory].handle(spec,extra) map {s => s(game_statestore)} //make the special environment by swapping in the new special store
        }
   }
-
-  //Register your factory
+    
+  //Register your factor
   manager.register(game_factory)
   //Now start an institution that uses your factory by passing in Some(<name of factory>)
   manager.start_institution("default",Some("game_factory")).now map console.set_institution
+
+  
   console.run_in_background  
+  
+  
+  
+  class GameInstitutionFactory_mysql(id:String,db_config:String) 
+  extends DefaultInstitutionFactory(id, "Game institution factory that uses Slick to store agent states") { 
+  //when it makes an environment factory, make a special one
+  override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
+    new SimpleEnvironmentFactory(manager.protocols) {
+      //Handle the creation differently
+      override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] = {
+        val id = spec.agent_id
+        //Debug message
+        System.err.println(s"------------\n Creating environment for $id!\n--------------")
+        try {
+          //Start from the default agent environment
+          val default_environment = super[SimpleEnvironmentFactory].handle(spec,extra) 
+          //Create the store to use
+          val my_store = create_store(id)
+          //make the special environment by swapping in the new special store
+          val my_environment = default_environment map {s => s(my_store)} 
+          System.err.println("Made my environment")
+          //Any other agent debug stuff here
+          System.err.println("DONE\n-----")
+          my_environment
+        } catch {
+          case e:Exception => System.err.println("Couldn't make environment: " + e )
+          throw e
+        }
+      }
+    }
+
+  //This is the function we're going to use for creating a game state store
+  //Uses the agent ID just for debugging
+  def create_store(id:String): SlickStateStore= {
+    val store = new MysqlSlickStateStoreURL(db_config)
+    System.err.println(s"Creating a new state store for agent $id")
+    store.init //connect to a database and table named "scalsc_states"
+    store
+  }
+  }
    
 }
 

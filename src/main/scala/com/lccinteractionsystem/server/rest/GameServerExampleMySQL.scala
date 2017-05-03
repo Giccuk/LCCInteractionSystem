@@ -75,6 +75,7 @@ object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocol
 
   //Now start an institution that uses the factory by passing in Some(<name of factory>)
   val institution = manager.start_institution("default",Some("gameInstitutin_factory")).now.get
+  //val institution = manager.start_institution("default").now.get
   System.err.println("Created Institution!")
   console.set_institution(institution)
   println("Insitution------------------------------\n")
@@ -84,6 +85,7 @@ object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocol
    ************************************************************************************************************/
   println("Interaction+++++++++++++++++++++++++++++\n")
   //Start an interaction, with an agent playing proposer
+  
   val interaction = institution.start_interaction(
       InteractionTemplate("ultimategame").with_agent("kev","proposer(10)"),
       NoData,"test_interaction_id").now.get
@@ -91,15 +93,23 @@ object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocol
 
   //Start another agent just as an example
   val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(10)"),None).now.get
+  
+  val comp = Elicit("e(offernum(8, R), _)")
+  agent.elicit( comp.to_lsc)
+  case class Elicit(elicit:String) {
+    def to_lsc = LSCParserHelpers.e(elicit)
+  }
+  
   console.set_agent(agent)
-
-  console.run_in_background  
+  
+  console.run_in_background 
   
   //Kick everything off, and then we'll see what's happened
   DelayedFuture( 3 seconds )({
     System.err.println("Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
     //Obviously, get rid of this line if you want the states to be there afterwards
     store.clear_states
+    
   })
    
 }

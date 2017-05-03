@@ -68,10 +68,10 @@ object ExampleGameServer extends InstitutionRESTServer(new ResourceProtocolStore
   val institution = manager.start_institution("default",Some("game_factory")).now.get
   System.err.println("Created Institution!")
   console.set_institution(institution)
-
+  
   /* At this point, there is an institution, but nothing is actually happening, so we start an interaction */
   
-  //Start an interaction, with an agent playing proposer
+    //Start an interaction, with an agent playing proposer
   val interaction = institution.start_interaction(
       InteractionTemplate("ultimategame_iterate").with_agent("kev","proposer(5,10,i,r)"),
       NoData,"test_interaction_id").now.get
@@ -80,16 +80,18 @@ object ExampleGameServer extends InstitutionRESTServer(new ResourceProtocolStore
   //Start another agent just as an example
   val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(5,10,i,r)"),None).now.get
   console.set_agent(agent)
-  
   console.run_in_background  
   
-  //Kick everything off, and then we'll see what's happened
+ 
+    //Kick everything off, and then we'll see what's happened
+
   DelayedFuture( 3 seconds )({
     System.err.println("Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
     //Obviously, get rid of this line if you want the states to be there afterwards
     store.clear_states
   })
    
+
 }
 
 //An InstitutionFactory that will use the Slick state store

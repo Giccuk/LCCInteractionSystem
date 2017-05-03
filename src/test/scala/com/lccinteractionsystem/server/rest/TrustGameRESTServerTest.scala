@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.restserver.simpletest
+package com.lccinteractionsystem.server.rest
 
 import com.moseph.scalsc.utility.BaseTest
 import com.twitter.finagle.http.Status._
@@ -15,7 +15,7 @@ import org.json4s._
  * Example server operation with JSON. Test class shows the JSON sent (for POST/PUT requests)
  * and the JSON expected after some of the creations
  */
-class UltimateGameRESTServerTest extends FeatureTest with Mockito {
+class TrustGameRESTServerTest extends FeatureTest with Mockito {
   val server = new EmbeddedHttpServer(new InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")))
   implicit val formats = DefaultFormats
   
@@ -76,11 +76,11 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
           {
             "template":
             {
-            "protocol_id" : "ultimategame",
+            "protocol_id" : "trustgame_simple",
             "agents": [
               {
-                "agent_id":"peter",
-                "roles" : [ { "role" : "proposer(10)" } ]
+                "agent_id":"ian",
+                "roles" : [ { "role" : "investor(10,3)" } ]
               }
             ]
             },
@@ -98,7 +98,7 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
     
     //Check that the interaction is there
     server.httpGet(
-        path=interaction_path,
+        path=interaction_path,//http://localhost:8888/interaction/user/manager/game_institution/int2142
         andExpect = Ok,
         withJsonBody = s"""
           {
@@ -107,7 +107,7 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/peter"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian"
               }
             ]
           }
@@ -121,8 +121,8 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
          postBody = """
          {
            "template":{
-             "agent_id":"richard",
-             "roles" : [ { "role" : "responder(10)" } ],
+             "agent_id":"ted",
+             "roles" : [ { "role" : "trustee(3)" } ]
            },
            "data" : {}
          }
@@ -131,14 +131,14 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
          withJsonBody = s"""
            {
              "type" : "agent",
-             "path":"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/richard"
+             "path":"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted"
            }
 
            """
          )
     //Check that the new agent is there
     server.httpGet(
-        path=interaction_path,// Should be somthing like: http://localhost:8888/interaction/user/manager/game_institution/int3890
+        path=interaction_path,// Should be  http://localhost:8888/interaction/user/manager/game_institution/int3890
         andExpect = Ok,
         withJsonBody = s"""
           {
@@ -147,11 +147,11 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/peter"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian"
               },
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/richard"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted"
               }
             ]
           }
@@ -160,27 +160,27 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
         )      
     Thread.sleep(1000)
     
-    val peter_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/peter"
-    val richard_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/richard"
+    val ian_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian"
+    val ted_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted"
     //6.start game. Attention!!! This step is so important: server has to AUTOMATLY "ask" agent ges about its "next_step". Based on the LCC protocol, agent ges should send a request about nice(hos). 
     //1st run
     server.httpGet(
-        path=peter_path,
+        path=ian_path,
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$peter_path",
-            "next_steps": ["e(offernum(X, R), _)"]
+            "path":"$ian_path",
+            "next_steps": ["e(invest(X, T), _)"]
           }
           """
             )
 
     //hos is waiting for something to fill in e(friend(G)) ,so we supply it
     server.httpPost(
-        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/peter",
+        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ian",
         postBody="""
-        {"elicited":"e(offernum(2, richard), _)"} 
+        {"elicited":"e(invest(4, ted), _)"} 
         """,
         andExpect = Ok
         )
@@ -188,22 +188,22 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
     
     //Second run
     server.httpGet(
-        path=richard_path,
+        path=ted_path,
         andExpect=Ok,
         withJsonBody=s"""
           {
             "type":"agent",
-            "path":"$richard_path",
-            "next_steps": ["e(acceptorno(D, X), _)"]
+            "path":"$ted_path",
+            "next_steps": ["e(repay(Y, I), _)"]
           }
           """
     )
 
-    //peter is waiting for something to fill in
+    //ian is waiting for something to fill in
     server.httpPost(
-        path=richard_path,
+        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ted",
         postBody="""
-        {"elicited":"e(acceptornot(reject, 2), _)"} 
+        {"elicited":"e(repay(3, ian), _)"} 
         """,
         andExpect = Ok
         )
@@ -212,24 +212,24 @@ class UltimateGameRESTServerTest extends FeatureTest with Mockito {
     
     //third run
     server.httpGet(
-        path=peter_path,
+        path=ian_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$peter_path",
+            "path":"$ian_path",
             "next_steps":[]
           }
           """
             )
             
     server.httpGet(
-        path=richard_path,
+        path=ted_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$richard_path",
+            "path":"$ted_path",
             "next_steps":[]
           }
           """

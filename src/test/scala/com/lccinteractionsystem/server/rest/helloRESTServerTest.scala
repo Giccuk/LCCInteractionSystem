@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.restserver.simpletest
+package com.lccinteractionsystem.server.rest
 
 import com.moseph.scalsc.utility.BaseTest
 import com.twitter.finagle.http.Status._
@@ -15,7 +15,7 @@ import org.json4s._
  * Example server operation with JSON. Test class shows the JSON sent (for POST/PUT requests)
  * and the JSON expected after some of the creations
  */
-class TrustGameRESTServerTest extends FeatureTest with Mockito {
+class helloRESTServerTest extends FeatureTest with Mockito {
   val server = new EmbeddedHttpServer(new InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")))
   implicit val formats = DefaultFormats
   
@@ -76,13 +76,13 @@ class TrustGameRESTServerTest extends FeatureTest with Mockito {
           {
             "template":
             {
-            "protocol_id" : "trustgame_simple",
+            "protocol_id" : "hello",
             "agents": [
               {
-                "agent_id":"ian",
-                "roles" : [ { "role" : "investor(10,3)" } ]
-              }
-            ]
+                "agent_id":"ges",
+                "roles" : [ { "role" : "guest" } ]
+              }, 
+            ],
             },
             "data" : {}
           }
@@ -98,7 +98,7 @@ class TrustGameRESTServerTest extends FeatureTest with Mockito {
     
     //Check that the interaction is there
     server.httpGet(
-        path=interaction_path,//http://localhost:8888/interaction/user/manager/game_institution/int2142
+        path=interaction_path,
         andExpect = Ok,
         withJsonBody = s"""
           {
@@ -107,11 +107,10 @@ class TrustGameRESTServerTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges"
               }
             ]
           }
-
           """
         )
     
@@ -121,8 +120,8 @@ class TrustGameRESTServerTest extends FeatureTest with Mockito {
          postBody = """
          {
            "template":{
-             "agent_id":"ted",
-             "roles" : [ { "role" : "trustee(3)" } ]
+             "agent_id":"hos",
+             "roles" : [ { "role" : "host" } ],
            },
            "data" : {}
          }
@@ -131,14 +130,13 @@ class TrustGameRESTServerTest extends FeatureTest with Mockito {
          withJsonBody = s"""
            {
              "type" : "agent",
-             "path":"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted"
+             "path":"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos"
            }
-
            """
          )
     //Check that the new agent is there
     server.httpGet(
-        path=interaction_path,// Should be  http://localhost:8888/interaction/user/manager/game_institution/int3890
+        path=interaction_path,// Should be somthing like: http://localhost:8888/interaction/user/manager/game_institution/int3890
         andExpect = Ok,
         withJsonBody = s"""
           {
@@ -147,93 +145,111 @@ class TrustGameRESTServerTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges"
               },
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos"
               }
             ]
           }
-
           """
         )      
     Thread.sleep(1000)
     
-    val ian_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian"
-    val ted_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted"
+    val hos_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos"
+    val ges_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges"
     //6.start game. Attention!!! This step is so important: server has to AUTOMATLY "ask" agent ges about its "next_step". Based on the LCC protocol, agent ges should send a request about nice(hos). 
-    //1st run
+   //1sr round  
     server.httpGet(
-        path=ian_path,
+        path=hos_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$ian_path",
-            "next_steps": ["e(invest(X, T), _)"]
+            "path":"$hos_path",
+            "next_steps": ["e(friend(G), _)"]
           }
           """
             )
-
+   /*server.httpGet(
+        path=ges_path,
+        andExpect = Ok,
+        withJsonBody = s"""
+          {
+            "type":"agent",
+            "path":"$ges_path",
+            "next_steps":["hello<=a(host,H)" ]
+          }
+          """
+            )*/
     //hos is waiting for something to fill in e(friend(G)) ,so we supply it
     server.httpPost(
-        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ian",
+        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/hos",
         postBody="""
-        {"elicited":"e(invest(4, ted), _)"} 
+        {"elicited":"e(friend(ges), _)"} 
         """,
         andExpect = Ok
         )
     Thread.sleep(1000)
     
-    //Second run
+    //2nd round
     server.httpGet(
-        path=ted_path,
+        path=ges_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges
         andExpect=Ok,
         withJsonBody=s"""
           {
             "type":"agent",
-            "path":"$ted_path",
-            "next_steps": ["e(repay(Y, I), _)"]
+            "path":"$ges_path",
+            "next_steps": ["e(nice(H))"]
           }
           """
     )
-
-    //ian is waiting for something to fill in
+    /*server.httpGet(
+        path=hos_path,
+        andExpect=Ok,
+        withJsonBody=s"""
+          {
+            "type":"agent",
+            "path":"$hos_path",
+            "next_steps":["hey<=a(guest,G)"]
+          }
+          """
+    )*/
+    //ges is waiting for something to fill in e(want(T)) so we'll supply it
     server.httpPost(
-        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ted",
+        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ges",
         postBody="""
-        {"elicited":"e(repay(3, ian), _)"} 
+        {"elicited":"e(nice(hos), _)"} 
         """,
         andExpect = Ok
         )
         //Wait again to make sure it's run through
     Thread.sleep(1000)
     
-    //third run
+    //3rd round
     server.httpGet(
-        path=ian_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ian
+        path=hos_path,//http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/hos
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$ian_path",
+            "path":"$hos_path",
             "next_steps":[]
           }
           """
             )
             
     server.httpGet(
-        path=ted_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted
+        path=ges_path,//http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ges
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$ted_path",
+            "path":"$ges_path",
             "next_steps":[]
           }
           """
             )
   }
-
 }

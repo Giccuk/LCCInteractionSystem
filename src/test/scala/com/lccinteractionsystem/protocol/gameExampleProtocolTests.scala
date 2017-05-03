@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.protocol_tests
+package com.lccinteractionsystem.protocol
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

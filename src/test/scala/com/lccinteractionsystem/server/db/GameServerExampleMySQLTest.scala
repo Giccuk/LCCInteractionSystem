@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.server.mysql
+package com.lccinteractionsystem.server.db
 
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.Controller
@@ -68,7 +68,7 @@ object MysqlStateSlick_Test extends InstitutionRESTServer(new ResourceProtocolSt
   manager.register(gameInstitution_factory)
 
   //Now start an institution that uses the factory by passing in Some(<name of factory>)
-  val institution = manager.start_institution("default",Some("gameInstitution_factory")).now.get
+  val institution = manager.start_institution("game_institution",Some("gameInstitution_factory")).now.get
   System.err.println("Created Institution!")
   console.set_institution(institution)
   println("Insitution------------------------------\n")
@@ -76,7 +76,7 @@ object MysqlStateSlick_Test extends InstitutionRESTServer(new ResourceProtocolSt
    * 
    *  At this point, there is an institution, but nothing is actually happening, so we start an interaction  
    ************************************************************************************************************/
-  println("Interaction+++++++++++++++++++++++++++++\n")
+  /*println("Interaction+++++++++++++++++++++++++++++\n")
   //Start an interaction, with an agent playing proposer
   val interaction =institution.start_interaction(
       InteractionTemplate("ultimategame").with_agent("kev","proposer(10)"),
@@ -88,16 +88,16 @@ object MysqlStateSlick_Test extends InstitutionRESTServer(new ResourceProtocolSt
   System.err.println("First :\n=>"+store.get_all_states().mkString("\n=>"))
   //Start another agent just as an example
   val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(10)"),None).now.get
-  console.set_agent(agent)
+  console.set_agent(agent)*/
 
   console.run_in_background  
-  System.err.println("before Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
+  /*System.err.println("before Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
   //Kick everything off, and then we'll see what's happened
   DelayedFuture( 3 seconds )({
     System.err.println("Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
     //Obviously, get rid of this line if you want the states to be there afterwards
     store.clear_states
-  })
+  })*/
    
 }
 

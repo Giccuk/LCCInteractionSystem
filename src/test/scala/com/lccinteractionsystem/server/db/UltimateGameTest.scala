@@ -1,4 +1,4 @@
-package com.lccinteractionsystem.restserver.simpletest
+package com.lccinteractionsystem.server.db
 
 import com.moseph.scalsc.utility.BaseTest
 import com.twitter.finagle.http.Status._
@@ -11,13 +11,38 @@ import com.moseph.scalsc.server.rest._
 import org.json4s.native.JsonMethods._
 import org.json4s._
 
+import com.moseph.scalsc.slick._
+import com.moseph.scalsc.environment._
+import com.moseph.scalsc.server._
+import com.moseph.scalsc.slick.mysql.MysqlSlickStateStoreURL
+import com.moseph.scalsc._
+import com.moseph.scalsc.running.StdInInstitutionConsole
+
 /**
  * Example server operation with JSON. Test class shows the JSON sent (for POST/PUT requests)
  * and the JSON expected after some of the creations
  */
-class helloRESTServerTest extends FeatureTest with Mockito {
-  val server = new EmbeddedHttpServer(new InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")))
+class UltimateGameTest extends FeatureTest with Mockito {
+  val gameserver=new InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols"))
+  val server = new EmbeddedHttpServer(gameserver)
   implicit val formats = DefaultFormats
+  
+  val console = new StdInInstitutionConsole {}
+  def game_statestore: SlickStateStore=new MysqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame")
+  game_statestore.init
+  val game_factory = new DefaultInstitutionFactory("game_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
+     override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
+       new SimpleEnvironmentFactory(manager.protocols) {//When you create an agent environment, make a special one
+         override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] =
+           super[SimpleEnvironmentFactory].handle(spec,extra) map {s => s(game_statestore)} //make the special environment by swapping in the new special store
+       }
+  }
+  gameserver.manager.register(game_factory)
+  //Now start an institution that uses your factory by passing in Some(<name of factory>)
+  //val inst=gameserver.manager.start_institution("default",Some("game_factory")).now.get 
+  //console.set_institution(inst)
+  //console.run_in_background 
+  
   
   "Server Setup" in {
     //0.Should start with no institutions at all
@@ -69,6 +94,7 @@ class helloRESTServerTest extends FeatureTest with Mockito {
           }
           """
         )
+  
     //4.create first agent and add its knowledge
     val inter_resp = server.httpPost(
         path="/institution/create/user/manager/game_institution",
@@ -76,13 +102,13 @@ class helloRESTServerTest extends FeatureTest with Mockito {
           {
             "template":
             {
-            "protocol_id" : "hello",
+            "protocol_id" : "ultimategame",
             "agents": [
               {
-                "agent_id":"ges",
-                "roles" : [ { "role" : "guest" } ]
-              }, 
-            ],
+                "agent_id":"peter",
+                "roles" : [ { "role" : "proposer(10)" } ]
+              }
+            ]
             },
             "data" : {}
           }
@@ -107,10 +133,11 @@ class helloRESTServerTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/peter"
               }
             ]
           }
+
           """
         )
     
@@ -120,8 +147,8 @@ class helloRESTServerTest extends FeatureTest with Mockito {
          postBody = """
          {
            "template":{
-             "agent_id":"hos",
-             "roles" : [ { "role" : "host" } ],
+             "agent_id":"richard",
+             "roles" : [ { "role" : "responder(10)" } ],
            },
            "data" : {}
          }
@@ -130,8 +157,9 @@ class helloRESTServerTest extends FeatureTest with Mockito {
          withJsonBody = s"""
            {
              "type" : "agent",
-             "path":"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos"
+             "path":"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/richard"
            }
+
            """
          )
     //Check that the new agent is there
@@ -145,111 +173,93 @@ class helloRESTServerTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/peter"
               },
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos"
+                "path" : "http://localhost:8888/agent/user/manager/game_institution/$interaction_id/richard"
               }
             ]
           }
+
           """
         )      
     Thread.sleep(1000)
     
-    val hos_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos"
-    val ges_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges"
+    val peter_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/peter"
+    val richard_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/richard"
     //6.start game. Attention!!! This step is so important: server has to AUTOMATLY "ask" agent ges about its "next_step". Based on the LCC protocol, agent ges should send a request about nice(hos). 
-   //1sr round  
+    //1st run
     server.httpGet(
-        path=hos_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/hos
+        path=peter_path,
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$hos_path",
-            "next_steps": ["e(friend(G), _)"]
+            "path":"$peter_path",
+            "next_steps": ["e(offernum(X, R), _)"]
           }
           """
             )
-   /*server.httpGet(
-        path=ges_path,
-        andExpect = Ok,
-        withJsonBody = s"""
-          {
-            "type":"agent",
-            "path":"$ges_path",
-            "next_steps":["hello<=a(host,H)" ]
-          }
-          """
-            )*/
+
     //hos is waiting for something to fill in e(friend(G)) ,so we supply it
     server.httpPost(
-        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/hos",
+        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/peter",
         postBody="""
-        {"elicited":"e(friend(ges), _)"} 
+        {"elicited":"e(offernum(2, richard), _)"} 
         """,
         andExpect = Ok
         )
     Thread.sleep(1000)
     
-    //2nd round
-    server.httpGet(
-        path=ges_path,//http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ges
+    //Second run
+  server.httpGet(
+        path=richard_path,
         andExpect=Ok,
         withJsonBody=s"""
           {
             "type":"agent",
-            "path":"$ges_path",
-            "next_steps": ["e(nice(H))"]
+            "path":"$richard_path",
+            "next_steps": ["e(acceptorno(D, X), _)"]
           }
           """
     )
-    /*server.httpGet(
-        path=hos_path,
-        andExpect=Ok,
-        withJsonBody=s"""
-          {
-            "type":"agent",
-            "path":"$hos_path",
-            "next_steps":["hey<=a(guest,G)"]
-          }
-          """
-    )*/
-    //ges is waiting for something to fill in e(want(T)) so we'll supply it
-    server.httpPost(
-        path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ges",
+
+    //peter is waiting for something to fill in
+    /*server.httpPost(
+        path=richard_path,
         postBody="""
-        {"elicited":"e(nice(hos), _)"} 
+        {"elicited":"e(acceptornot(reject, 2), _)"} 
         """,
         andExpect = Ok
         )
         //Wait again to make sure it's run through
     Thread.sleep(1000)
     
-    //3rd round
+    //third run
     server.httpGet(
-        path=hos_path,//http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/hos
+        path=peter_path,
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$hos_path",
+            "path":"$peter_path",
             "next_steps":[]
           }
           """
             )
             
     server.httpGet(
-        path=ges_path,//http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ges
+        path=richard_path,
         andExpect = Ok,
         withJsonBody = s"""
           {
             "type":"agent",
-            "path":"$ges_path",
+            "path":"$richard_path",
             "next_steps":[]
           }
           """
-            )
+            )*/
   }
+
 }
