@@ -1,0 +1,7 @@
+0. gamecommands.php contains all the methods and information to run all the interaction experiments.
+
+1.ultimategane
+
+1.1 proposer side:welcome->proposerform->responderreply->proposercomments
+
+1.2 responder side:welcom->responderform->proposerreply->respondercomments
