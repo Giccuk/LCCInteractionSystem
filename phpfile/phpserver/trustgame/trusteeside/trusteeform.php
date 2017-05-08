@@ -47,7 +47,7 @@
             fwrite($fp2, $newdata_json);
             fclose($fp2);
 
-            header("Location:http://localhost/phpserver/trustgame/trusteeside/investorreply.php");
+            header("Location:http://{$gameserveraddress}/trustgame/trusteeside/investorreply.php");
          }
          else{
             echo "<br>";

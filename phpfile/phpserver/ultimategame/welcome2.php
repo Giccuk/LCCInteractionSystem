@@ -20,18 +20,18 @@
   if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if (isset($_POST["role"])&&$_POST["role"]=="Proposer"){/*-------------------------------proposer side---------------------------------*/
       //echo "0. Check initial state<br><br>";
-      $defaultstate_json=getrequest("http://{$localhost_path}/institutions");echo '<br><br>';
+      $defaultstate_json=getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>';
       //sleep(1);
       $defaultstate=json_decode($defaultstate_json,true);
       $subject=$defaultstate["0"]["path"];
-      $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+      $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
       if ($matches[1]=="default"){//server is ready
         //echo "1. Create an institution<br><br>";
-        $institutionstate_json=CreateInstitution($localhost_path,$institutionname);
+        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
         $institutionstate=json_decode($institutionstate_json,true);
         $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
         preg_match($pattern,$subject,$matches);
         if ($matches[1]==$institutionname){//institution is created successfully
           header("Location:http://localhost/phpserver/ultimategame/proposerside/proposerform.php");
@@ -46,33 +46,33 @@
     }
     elseif (isset($_POST["role"])&&$_POST["role"]=="Responder"){/*-------------------------------responder side---------------------------------*/
       //echo "0. Check initial state<br><br>";
-      $defaultstate_json=getrequest("http://{$localhost_path}/institutions");echo '<br><br>';
+      $defaultstate_json=getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>';
       sleep(1);
       $defaultstate=json_decode($defaultstate_json,true);
       $subject=$defaultstate["0"]["path"];
-      $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+      $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
       if ($matches[1]=="default"){//server is ready
         //Create an institution
-        $institutionstate_json=CreateInstitution($localhost_path,$institutionname);
+        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
         $institutionstate=json_decode($institutionstate_json,true);
         $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
         preg_match($pattern,$subject,$matches);
         if ($matches[1]==$institutionname){//instution has been created successfully
-          $firstagent_state=CreateFirstagent($localhost_path,$institutionname,$game_protocolid,$firstagent_id,$firstagent_role);//create first agent 
-          $interactionid_responderside=GetInteractionId($firstagent_state,$localhost_path,$institutionname);
+          $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);//create first agent 
+          $interactionid_responderside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname);
 
           if ($interactionid_responderside!=""){//firstagent has been created successfully
-            $interactionpath="http://{$localhost_path}/interaction/user/manager/{$institutionname}/{$interactionid_responderside}";
-            CreateOtherAgent($localhost_path,$institutionname,$interactionid_responderside,$secondagent_id,$secondagent_role);//create second agent
+            $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_responderside}";
+            CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_responderside,$secondagent_id,$secondagent_role);//create second agent
             sleep(1);
             $allagentsstates_json=getrequest($interactionpath);
             $allagentsstates=json_decode($allagentsstates_json,true);
             if (count($allagentsstates["agents"])==2){//all two agents have been created successfully
-              //$firstagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid_responderside,$firstagent_id);
+              //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$firstagent_id);
               $firstagent_response_1="e(offernum({$proposeroffer}, richard), _)";  
-              AnswerAgentNextStep($localhost_path,$institutionname,$interactionid_responderside,$firstagent_id,$firstagent_response_1);
+              AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$firstagent_id,$firstagent_response_1);
               sleep(1);
             }
             else{

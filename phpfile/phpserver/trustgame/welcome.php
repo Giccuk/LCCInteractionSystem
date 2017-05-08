@@ -20,21 +20,21 @@
   if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if (isset($_POST["role"])&&$_POST["role"]=="Investor"){/*-------------------------------Investor side---------------------------------*/
       //echo "0. Check initial state<br><br>";
-      $defaultstate_json=getrequest("http://{$localhost_path}/institutions");echo '<br><br>';
+      $defaultstate_json=getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>';
       //sleep(1);
       $defaultstate=json_decode($defaultstate_json,true);
       $subject=$defaultstate["0"]["path"];
-      $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+      $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
       if ($matches[1]=="default"){//server is ready
         //echo "1. Create an institution<br><br>";
-        $institutionstate_json=CreateInstitution($localhost_path,$institutionname);
+        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
         $institutionstate=json_decode($institutionstate_json,true);
         $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
         preg_match($pattern,$subject,$matches);
         if ($matches[1]==$institutionname){//institution is created successfully
-          header("Location:http://localhost/phpserver/trustgame/investorside/investorform.php");
+          header("Location:http://{$gameserveraddress}/trustgame/investorside/investorform.php");
         }
         else{
           echo "Failed to create the game institution *_*<br><br>";
@@ -46,43 +46,43 @@
     }
     elseif (isset($_POST["role"])&&$_POST["role"]=="Trustee"){/*-------------------------------Trustee side---------------------------------*/
       //echo "0. Check initial state<br><br>";
-      $defaultstate_json=getrequest("http://{$localhost_path}/institutions");echo '<br><br>';
+      $defaultstate_json=getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>';
       sleep(1);
       $defaultstate=json_decode($defaultstate_json,true);
       $subject=$defaultstate["0"]["path"];
-      $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+      $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
       if ($matches[1]=="default"){//server is ready
         //Create an institution
-        $institutionstate_json=CreateInstitution($localhost_path,$institutionname);
+        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
         $institutionstate=json_decode($institutionstate_json,true);
         $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
+        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
         preg_match($pattern,$subject,$matches);
         if ($matches[1]==$institutionname){//instution has been created successfully
-          $firstagent_state=CreateFirstagent($localhost_path,$institutionname,$game_protocolid,$firstagent_id,$firstagent_role);//create first agent 
-          $interactionid_Trusteeside=GetInteractionId($firstagent_state,$localhost_path,$institutionname);
+          $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);//create first agent 
+          $interactionid_Trusteeside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname);
 
           if ($interactionid_Trusteeside!=""){//firstagent has been created successfully
-            $interactionpath="http://{$localhost_path}/interaction/user/manager/{$institutionname}/{$interactionid_Trusteeside}";
-            CreateOtherAgent($localhost_path,$institutionname,$interactionid_Trusteeside,$secondagent_id,$secondagent_role);//create second agent
+            $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_Trusteeside}";
+            CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_Trusteeside,$secondagent_id,$secondagent_role);//create second agent
             sleep(1);
             $allagentsstates_json=getrequest($interactionpath);
             $allagentsstates=json_decode($allagentsstates_json,true);
             if (count($allagentsstates["agents"])==2){//all two agents have been created successfully
 
-              //$firstagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid_Trusteeside,$firstagent_id);
+              //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_Trusteeside,$firstagent_id);
               $firstagent_response_1="e(invest({$investoroffer}, {$secondagent_id}), _)";  
-              AnswerAgentNextStep($localhost_path,$institutionname,$interactionid_Trusteeside,$firstagent_id,$firstagent_response_1);
+              AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_Trusteeside,$firstagent_id,$firstagent_response_1);
               sleep(1);  
               //pass interactionid to trusteeside
               $keydata=array("interid"=>$interactionid_Trusteeside);
               $keydata_json=json_encode($keydata);
-              $fp=fopen('/Applications/XAMPP/htdocs/phpserver/trustgame/trusteeside/trusteeinfo.json','w');
+              $fp=fopen("{$sourcefiledir}/trustgame/trusteeside/trusteeinfo.json",'w');
               fwrite($fp, $keydata_json);
               fclose($fp);
               //go to next step to get trustee repay
-              header("Location:http://localhost/phpserver/trustgame/Trusteeside/Trusteeform.php");
+              header("Location:http://{$gameserveraddress}/trustgame/Trusteeside/Trusteeform.php");
             }
             else{
               echo "Failed to create the second agent. *_*<br><br>";
