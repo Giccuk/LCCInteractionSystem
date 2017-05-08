@@ -37,7 +37,7 @@ import com.moseph.scalsc.server.rest._
 
 object GameServerSimple extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   val console = new StdInInstitutionConsole {} 
-  manager.start_institution("default").now map console.set_institution  
+  manager.start_institution("game_institution").now map console.set_institution  
   console.run_in_background
   
 }

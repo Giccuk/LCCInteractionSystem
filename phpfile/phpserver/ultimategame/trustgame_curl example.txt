@@ -1,0 +1,38 @@
+P:http://localhost:8888/create_institution
+{"name":"game_institution"}
+
+P:http://localhost:8888/institution/create/user/manager/game_institution
+	{
+            "template":
+            {
+            "protocol_id" : "trustgame_simple",
+            "agents": [
+              {
+                "agent_id":"ellen",
+                "roles" : [ { "role" : "investor(10,3)" } ]
+              }
+            ]
+            },
+            "data" : {}
+          }
+
+P:http://localhost:8888/interaction/create/user/manager/game_institution/$interaction_id
+	{
+           "template":{
+             "agent_id":"ted",
+             "roles" : [ { "role" : "trustee(3)" } ]
+           },
+           "data" : {}
+         }
+
+G:http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ellen
+
+P:http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ellen
+{"elicited":"e(offernum(2, ted), _)"}
+ 
+G:http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted
+
+P:http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ted
+{"elicited":"e(acceptornot(reject, 2), _)"}
+
+G:http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ellen

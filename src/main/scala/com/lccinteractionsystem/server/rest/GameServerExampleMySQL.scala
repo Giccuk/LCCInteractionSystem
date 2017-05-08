@@ -49,10 +49,9 @@ object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocol
   val gameInstitutin_factory = new GameInstitutionFactory_mysql("gameInstitutin_factory",dburl)
   
   /***************************************************************************
-   *    
    * The next few lines are just for testing, and showing what is happening 
    ****************************************************************************/
-  println("test+++++++++++++++++++++++++++++\n")
+  
   //This is a store we'll use to test whether states are present before and after starting the interaction
   val store = gameInstitutin_factory.create_store("test_store")
 
@@ -61,56 +60,24 @@ object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocol
 
   //What states were left over from the previous run?
   System.err.println("States before the run:\n=>"+store.get_all_states().mkString("\n=>"))
-  println("test------------------------------\n")
+  
   /**************************
    * End testing block
    **************************/
 
   //Start a console to interact with the agents if we want to 
-  println("Insitution+++++++++++++++++++++++++++++\n")
   val console = new StdInInstitutionConsole {}
   
   //Register the factory
   manager.register(gameInstitutin_factory)
 
   //Now start an institution that uses the factory by passing in Some(<name of factory>)
-  val institution = manager.start_institution("default",Some("gameInstitutin_factory")).now.get
+  val institution = manager.start_institution("game_institution",Some("gameInstitutin_factory")).now.get
   //val institution = manager.start_institution("default").now.get
   System.err.println("Created Institution!")
   console.set_institution(institution)
-  println("Insitution------------------------------\n")
-  /***********************************************************************************************************
-   * 
-   *  At this point, there is an institution, but nothing is actually happening, so we start an interaction  
-   ************************************************************************************************************/
-  println("Interaction+++++++++++++++++++++++++++++\n")
-  //Start an interaction, with an agent playing proposer
-  
-  val interaction = institution.start_interaction(
-      InteractionTemplate("ultimategame").with_agent("kev","proposer(10)"),
-      NoData,"test_interaction_id").now.get
-  console.set_interaction(interaction)
 
-  //Start another agent just as an example
-  val agent = interaction.create_agent(AgentTemplate("jimmy",Nil,Nil).playing("proposer(10)"),None).now.get
-  
-  val comp = Elicit("e(offernum(8, R), _)")
-  agent.elicit( comp.to_lsc)
-  case class Elicit(elicit:String) {
-    def to_lsc = LSCParserHelpers.e(elicit)
-  }
-  
-  console.set_agent(agent)
-  
   console.run_in_background 
-  
-  //Kick everything off, and then we'll see what's happened
-  DelayedFuture( 3 seconds )({
-    System.err.println("Ending States:\n=>"+store.get_all_states().mkString("\n=>"))
-    //Obviously, get rid of this line if you want the states to be there afterwards
-    store.clear_states
-    
-  })
    
 }
 
@@ -147,7 +114,7 @@ class GameInstitutionFactory_mysql(id:String,db_config:String)
   //This is the function we're going to use for creating a game state store
   //Uses the agent ID just for debugging
   def create_store(id:String): SlickStateStore= {
-    val store = new MysqlSlickStateStoreURL(db_config)
+    val store = new MysqlSlickStateStoreURL(db_config,"host","host")
     System.err.println(s"Creating a new state store for agent $id")
     store.init //connect to a database and table named "scalsc_states"
     store

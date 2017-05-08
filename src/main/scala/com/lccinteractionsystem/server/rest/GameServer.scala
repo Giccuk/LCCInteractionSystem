@@ -55,13 +55,12 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
   //Register your factor
   manager.register(game_factory)
   //Now start an institution that uses your factory by passing in Some(<name of factory>)
-  manager.start_institution("default",Some("game_factory")).now map console.set_institution
+  manager.start_institution("game_institution",Some("game_factory")).now map console.set_institution
 
   
   console.run_in_background  
-  
-  
-  
+
+    
   class GameInstitutionFactory_mysql(id:String,db_config:String) 
   extends DefaultInstitutionFactory(id, "Game institution factory that uses Slick to store agent states") { 
   //when it makes an environment factory, make a special one
@@ -93,7 +92,7 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
   //This is the function we're going to use for creating a game state store
   //Uses the agent ID just for debugging
   def create_store(id:String): SlickStateStore= {
-    val store = new MysqlSlickStateStoreURL(db_config)
+    val store = new MysqlSlickStateStoreURL(db_config,"host","host")
     System.err.println(s"Creating a new state store for agent $id")
     store.init //connect to a database and table named "scalsc_states"
     store

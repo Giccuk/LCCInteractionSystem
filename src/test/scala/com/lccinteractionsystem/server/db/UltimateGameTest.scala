@@ -28,7 +28,7 @@ class UltimateGameTest extends FeatureTest with Mockito {
   implicit val formats = DefaultFormats
   
   val console = new StdInInstitutionConsole {}
-  def game_statestore: SlickStateStore=new MysqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame")
+  def game_statestore: SlickStateStore=new MysqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame","host","host")
   game_statestore.init
   val game_factory = new DefaultInstitutionFactory("game_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
      override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
@@ -189,7 +189,7 @@ class UltimateGameTest extends FeatureTest with Mockito {
     val richard_path = s"http://localhost:8888/agent/user/manager/game_institution/$interaction_id/richard"
     //6.start game. Attention!!! This step is so important: server has to AUTOMATLY "ask" agent ges about its "next_step". Based on the LCC protocol, agent ges should send a request about nice(hos). 
     //1st run
-    server.httpGet(
+   server.httpGet(
         path=peter_path,
         andExpect = Ok,
         withJsonBody = s"""
@@ -202,7 +202,7 @@ class UltimateGameTest extends FeatureTest with Mockito {
             )
 
     //hos is waiting for something to fill in e(friend(G)) ,so we supply it
-  /*  server.httpPost(
+   server.httpPost(
         path=s"http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/peter",
         postBody="""
         {"elicited":"e(offernum(2, richard), _)"} 
@@ -248,7 +248,7 @@ class UltimateGameTest extends FeatureTest with Mockito {
           """
             )
             
-    server.httpGet(
+   /* server.httpGet(
         path=richard_path,
         andExpect = Ok,
         withJsonBody = s"""
