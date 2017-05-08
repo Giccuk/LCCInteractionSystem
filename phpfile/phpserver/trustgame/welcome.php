@@ -34,7 +34,7 @@
         $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
         preg_match($pattern,$subject,$matches);
         if ($matches[1]==$institutionname){//institution is created successfully
-          header("Location:http://{$serveraddress}/phpserver/trustgame/investorside/investorform.php");
+          header("Location:http://localhost/phpserver/trustgame/investorside/investorform.php");
         }
         else{
           echo "Failed to create the game institution *_*<br><br>";
@@ -78,11 +78,11 @@
               //pass interactionid to trusteeside
               $keydata=array("interid"=>$interactionid_Trusteeside);
               $keydata_json=json_encode($keydata);
-              $fp=fopen('{$sourcefiledir}/phpserver/trustgame/trusteeside/trusteeinfo.json','w');
+              $fp=fopen('/Applications/XAMPP/htdocs/phpserver/trustgame/trusteeside/trusteeinfo.json','w');
               fwrite($fp, $keydata_json);
               fclose($fp);
               //go to next step to get trustee repay
-              header("Location:http://{$serveraddress}/phpserver/trustgame/Trusteeside/Trusteeform.php");
+              header("Location:http://localhost/phpserver/trustgame/Trusteeside/Trusteeform.php");
             }
             else{
               echo "Failed to create the second agent. *_*<br><br>";

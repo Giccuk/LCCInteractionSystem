@@ -6,7 +6,6 @@
 <body>
 
 <?php 
-
 	include 'responderinfo.php';
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -19,6 +18,7 @@
 			//$interactionid_responderside=$_GET["finalid"];
 			$secondagent_response_1="e(acceptornot({$_POST["responderchoice"]}, {$proposeroffer}), _)";
 			AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$secondagent_id,$secondagent_response_1);
+			
 	        sleep(1);
 
 	        msgstorecsv("{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(acceptornot({$_POST["responderchoice"]}#{$proposeroffer}))");

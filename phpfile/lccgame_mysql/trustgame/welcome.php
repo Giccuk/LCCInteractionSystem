@@ -26,19 +26,8 @@
       $subject=$defaultstate["0"]["path"];
       $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
-      if ($matches[1]=="default"){//server is ready
-        //echo "1. Create an institution<br><br>";
-        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
-        $institutionstate=json_decode($institutionstate_json,true);
-        $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
-        preg_match($pattern,$subject,$matches);
-        if ($matches[1]==$institutionname){//institution is created successfully
+      if ($matches[1]=="{$defaultinst}"){//server is ready
           header("Location:http://{$gameserveraddress}/trustgame/investorside/investorform.php");
-        }
-        else{
-          echo "Failed to create the game institution *_*<br><br>";
-        }
       }
       else{
         echo "Failed to start the game server *_*<br><br>";
@@ -52,14 +41,7 @@
       $subject=$defaultstate["0"]["path"];
       $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
-      if ($matches[1]=="default"){//server is ready
-        //Create an institution
-        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
-        $institutionstate=json_decode($institutionstate_json,true);
-        $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
-        preg_match($pattern,$subject,$matches);
-        if ($matches[1]==$institutionname){//instution has been created successfully
+      if ($matches[1]=="{$defaultinst}"){//server is ready
           $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);//create first agent 
           $interactionid_Trusteeside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname);
 
@@ -94,10 +76,6 @@
           else{
             echo "Failed to create new interaction. *_* <br><br>";
           }
-        }
-        else{
-          echo "Failed to create the game institution *_*<br><br>";
-        }
       }
       else{
         echo "Failed to start the game server *_*<br><br>";

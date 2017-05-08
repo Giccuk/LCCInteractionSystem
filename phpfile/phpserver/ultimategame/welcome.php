@@ -34,7 +34,7 @@
         $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
         preg_match($pattern,$subject,$matches);
         if ($matches[1]==$institutionname){//institution is created successfully
-          header("Location:http://{$serveraddress}/phpserver/ultimategame/proposerside/proposerform.php");
+          header("Location:http://localhost/phpserver/ultimategame/proposerside/proposerform.php");
         }
         else{
           echo "Failed to create the game institution *_*<br><br>";

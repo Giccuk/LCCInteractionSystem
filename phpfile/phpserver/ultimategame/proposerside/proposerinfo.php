@@ -1,7 +1,5 @@
 <?php
    //before 0.
-    $sourcefiledir="/var/www/html/ilw/game";
-    $serveraddress="localhost";
     $localhost_path="localhost:8888";
     $institutionname="game_institution";
     $game_protocolid="ultimategame";

@@ -1,7 +1,5 @@
 <?php
    //before 0.
-    $serveraddress="localhost";
-    $sourcefiledir="/var/www/html/ilw/game";
     $localhost_path="localhost:8888";
     $institutionname="game_institution";
     $game_protocolid="trustgame_simple";

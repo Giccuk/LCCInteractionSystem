@@ -1,35 +1,42 @@
 <?php
    //before 0.
-    $sourcefiledir="/Applications/XAMPP/htdocs/lccgame_db";
-    $gameserveraddress="localhost/lccgame_db";
+    $sourcefiledir="/Applications/XAMPP/htdocs/lccgame_mysql";
+    $gameserveraddress="localhost/lccgame_mysql";
     $lccengineaddress="localhost:8888";
     $institutionname="game_institution";
-    $gameprotocol_id="ultimategame";
+    $gameprotocol_id="trustgame_simple";
+    $defaultinst="game_institution";
 
     $game_total=10;
+    $game_rate=3;
 
-    $firstagent_id="peter";   
-    $firstagent_role="proposer({$game_total})";
+    $firstagent_id="ellen";
+    $firstagent_role="investor({$game_total},{$game_rate})";
 
-    $secondagent_id="richard";
-    $secondagent_role="responder({$game_total})";
+    $secondagent_id="ted";
+    $secondagent_role="trustee($game_rate)";
 
-    $proposeroffer="2";
-    $responderchoice="reject";
+
+    $investoroffer="4";
+    $trusteerepay="3";
+
   //0.1
   function msgstorecsv($protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody){
       //$csv_header=array('msgsenderid','msgsenderrole','msgreceiverid','msgreceiverrole','msgbody');
-      $csv_body=array("$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody");
+      $inputdata=array($protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody);
+      for ($x=0;$x<sizeof($inputdata);$x++){
+        $inputdata[$x]=str_replace(',', '#', $inputdata[$x]);
+      }
+      $data=array("{$inputdata[0]},{$inputdata[1]},{$inputdata[2]},{$inputdata[3]},{$inputdata[4]},{$inputdata[5]}");
       $fp=fopen('/Users/cancui/msgdata.csv','a');
-      foreach ($csv_body as $row) {
-          fputcsv($fp, explode(',', $row));
+      foreach ($data as $row) {
+          fputcsv($fp, explode(',',$row));
       }
       fclose($fp);
     }
 
 
-
-  //0.2
+  //0.
   function getrequest($getpath){
     $curlrequest = curl_init();
     curl_setopt($curlrequest, CURLOPT_URL, $getpath);

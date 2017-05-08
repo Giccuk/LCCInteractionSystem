@@ -28,11 +28,11 @@ P:http://localhost:8888/interaction/create/user/manager/game_institution/$intera
 G:http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ellen
 
 P:http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ellen
-{"elicited":"e(offernum(2, ted), _)"}
+{"elicited”:”e(invest(2, ted), _)"}
  
 G:http://localhost:8888/agent/user/manager/game_institution/$interaction_id/ted
 
 P:http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ted
-{"elicited":"e(acceptornot(reject, 2), _)"}
+{"elicited”:”e(repay(1, ellen), _)"}
 
 G:http://localhost:8888/agent/elicited/user/manager/game_institution/$interaction_id/ellen

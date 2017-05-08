@@ -26,22 +26,11 @@
       $subject=$defaultstate["0"]["path"];
       $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
-      if ($matches[1]=="default"){//server is ready
-        //echo "1. Create an institution<br><br>";
-        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
-        $institutionstate=json_decode($institutionstate_json,true);
-        $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
-        preg_match($pattern,$subject,$matches);
-        if ($matches[1]==$institutionname){//institution is created successfully
+      if ($matches[1]=="{$defaultinst}"){//server is ready
           header("Location:http://{$gameserveraddress}/ultimategame/proposerside/proposerform.php");
-        }
-        else{
-          echo "Failed to create the game institution *_*<br><br>";
-        }
       }
       else{
-        echo "Failed to start teh game server *_*<br><br>";
+        echo "Failed to start the game server *_*<br><br>";
       }    
     }
     elseif (isset($_POST["role"])&&$_POST["role"]=="Responder"){/*----------responder side--------------------*/
@@ -52,17 +41,9 @@
       $subject=$defaultstate["0"]["path"];
       $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
-      if ($matches[1]=="default"){//server is ready
-        //Create an institution
-        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
-        $institutionstate=json_decode($institutionstate_json,true);
-        $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
-        preg_match($pattern,$subject,$matches);
-        if ($matches[1]==$institutionname){//instution has been created successfully
+      if ($matches[1]=="{$defaultinst}"){//server is ready
           $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);//create first agent 
           $interactionid_responderside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname);
-
           if ($interactionid_responderside!=""){//firstagent has been created successfully
             $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_responderside}";
             CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_responderside,$secondagent_id,$secondagent_role);//create second agent
@@ -78,8 +59,9 @@
               msgstorecsv("{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(offernum({$proposeroffer}#{$secondagent_id}))");
 
               $keydata=array("interid"=>$interactionid_responderside);
+
               $keydata_json=json_encode($keydata);
-              $fp=fopen('{$sourcefiledir}/ultimategame/responderside/responderinfo.json','w' );
+              $fp=fopen("{$sourcefiledir}/ultimategame/responderside/responderinfo.json",'w' );
               fwrite($fp, $keydata_json);
               fclose($fp);
 
@@ -91,15 +73,10 @@
           }
           else{
             echo "Failed to create new interaction. *_* <br><br>";
-          }
-          
+          } 
         }
-        else{
-          echo "Failed to create the game institution *_*<br><br>";
-        }
-      }
       else{
-        echo "Failed to start the  game server *_*<br><br>";
+        echo "Failed to start the game server *_*<br><br>";
       }    
     }
     else {

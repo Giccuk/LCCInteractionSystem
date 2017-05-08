@@ -1,10 +1,11 @@
 <?php
    //before 0.
-    $sourcefiledir="/Applications/XAMPP/htdocs/lccgame_db";
-    $gameserveraddress="localhost/lccgame_db";
+    $sourcefiledir="/Applications/XAMPP/htdocs/lccgame_mysql";
+    $gameserveraddress="localhost/lccgame_mysql";
     $lccengineaddress="localhost:8888";
     $institutionname="game_institution";
     $gameprotocol_id="trustgame_simple";
+    $defaultinst="game_institution";
 
     $game_total=10;
     $game_rate=3;
@@ -20,10 +21,14 @@
   //0.1
   function msgstorecsv($protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody){
       //$csv_header=array('msgsenderid','msgsenderrole','msgreceiverid','msgreceiverrole','msgbody');
-      $csv_body=array("$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody");
+      $inputdata=array($protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody);
+      for ($x=0;$x<sizeof($inputdata);$x++){
+        $inputdata[$x]=str_replace(',', '#', $inputdata[$x]);
+      }
+      $data=array("{$inputdata[0]},{$inputdata[1]},{$inputdata[2]},{$inputdata[3]},{$inputdata[4]},{$inputdata[5]}");
       $fp=fopen('/Users/cancui/msgdata.csv','a');
-      foreach ($csv_body as $row) {
-          fputcsv($fp, explode(',', $row));
+      foreach ($data as $row) {
+          fputcsv($fp, explode(',',$row));
       }
       fclose($fp);
     }
