@@ -14,14 +14,14 @@
     if (isset($_POST["investoroffer"])&&!empty($_POST["investoroffer"])){
 
         /*-----------2. Create first agent--------------------*/
-        $firstagent_state=CreateFirstagent($localhost_path,$institutionname,$game_protocolid,$firstagent_id,$firstagent_role);
-        $interactionid_investorside=GetInteractionId($firstagent_state,$localhost_path,$institutionname); 
+        $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);
+        $interactionid_investorside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname); 
 
         if ($interactionid_investorside!=""){
           /*---------2.2 check firstagent state---------------*/
-          $interactionpath="http://{$localhost_path}/interaction/user/manager/{$institutionname}/{$interactionid_investorside}";
+          $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_investorside}";
           /*----------3. create second agent----------------*/
-          CreateOtherAgent($localhost_path,$institutionname,$interactionid_investorside,$secondagent_id,$secondagent_role);
+          CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id,$secondagent_role);
           sleep(1);
           /*------------3.1 check if all agents are created ---------------*/
           $allagentsstates_json=getrequest($interactionpath);
@@ -29,16 +29,16 @@
 
           if (count($allagentsstates["agents"])==2){
 
-            //$firstagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid,$firstagent_id);
+            //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$firstagent_id);
 
             $firstagent_response_1="e(invest({$_POST["investoroffer"]}, {$secondagent_id}), _)";  
-            AnswerAgentNextStep($localhost_path,$institutionname,$interactionid_investorside,$firstagent_id,$firstagent_response_1);
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$firstagent_id,$firstagent_response_1);
             sleep(1);
 
-            //$secondagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid_investorside,$secondagent_id);
+            //$secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id);
 
             $secondagent_response_1="e(repay({$trusteerepay}, {$firstagent_id}), _)";
-            AnswerAgentNextStep($localhost_path,$institutionname,$interactionid_investorside,$secondagent_id,$secondagent_response_1);
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id,$secondagent_response_1);
             sleep(1);
             
             //var_dump($secondagent_response_1); echo"<br><br>";

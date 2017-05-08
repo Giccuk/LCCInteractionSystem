@@ -14,14 +14,14 @@
     if (isset($_POST["proposeroffer"])&&!empty($_POST["proposeroffer"])){
 
         /*-----------2. Create first agent--------------------*/
-        $firstagent_state=CreateFirstagent($localhost_path,$institutionname,$game_protocolid,$firstagent_id,$firstagent_role);
-        $interactionid_proposerside=GetInteractionId($firstagent_state,$localhost_path,$institutionname); 
+        $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);
+        $interactionid_proposerside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname); 
 
         if ($interactionid_proposerside!=""){
           /*---------2.2 check firstagent state---------------*/
-          $interactionpath="http://{$localhost_path}/interaction/user/manager/{$institutionname}/{$interactionid_proposerside}";
+          $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_proposerside}";
           /*----------3. create second agent----------------*/
-          CreateOtherAgent($localhost_path,$institutionname,$interactionid_proposerside,$secondagent_id,$secondagent_role);
+          CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_proposerside,$secondagent_id,$secondagent_role);
           sleep(1);
           /*------------3.1 check if all agents are created ---------------*/
           $allagentsstates_json=getrequest($interactionpath);
@@ -29,16 +29,16 @@
 
           if (count($allagentsstates["agents"])==2){
 
-            //$firstagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid,$firstagent_id);
+            //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$firstagent_id);
 
             $firstagent_response_1="e(offernum({$_POST["proposeroffer"]}, richard), _)";  
-            AnswerAgentNextStep($localhost_path,$institutionname,$interactionid_proposerside,$firstagent_id,$firstagent_response_1);
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$firstagent_id,$firstagent_response_1);
             sleep(1);
 
-            //$secondagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid,$secondagent_id);
+            //$secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$secondagent_id);
 
             $secondagent_response_1="e(acceptornot({$responderchoice}, {$_POST["proposeroffer"]}), _)";
-            AnswerAgentNextStep($localhost_path,$institutionname,$interactionid_proposerside,$secondagent_id,$secondagent_response_1);
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$secondagent_id,$secondagent_response_1);
             sleep(1);
             
             //var_dump($secondagent_response_1); echo"<br><br>";

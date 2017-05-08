@@ -17,7 +17,7 @@
 	$interactionid_trusteeside=$gamedata["interid"];
 
 	$secondagent_response_1="e(repay({$finalrepay}, {$firstagent_id}), _)";
-	AnswerAgentNextStep($localhost_path,$institutionname,$interactionid_trusteeside,$secondagent_id,$secondagent_response_1);
+	AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_trusteeside,$secondagent_id,$secondagent_response_1);
 	sleep(1);
 	//$trusteeown=$investoroffer*$game_rate-$finalrepay; 
 	//echo $trusteeown."<br>";  
