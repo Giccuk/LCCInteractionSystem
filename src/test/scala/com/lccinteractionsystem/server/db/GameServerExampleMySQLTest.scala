@@ -35,6 +35,7 @@ import com.moseph.scalsc.environment._
 import com.moseph.scalsc.server._
 import com.moseph.scalsc.slick.mysql.MysqlSlickStateStoreURL
 import scala.concurrent.duration._
+import com.lccinteractionsystem.slick.mysql._
 
 object MysqlStateSlick_Test extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   
@@ -134,7 +135,7 @@ class GameInstitutionFactory_mysql(id:String,db_config:String)
   //This is the function we're going to use for creating a game state store
   //Uses the agent ID just for debugging
   def create_store(id:String): SlickStateStore= {
-    val store = new MysqlSlickStateStoreURL(db_config,"host","host")
+    val store = new GameMySqlSlickStateStoreURL(db_config,"host","host")
     System.err.println(s"Creating a new state store for agent $id")
     store.init //connect to a database and table named "scalsc_states"
     store
