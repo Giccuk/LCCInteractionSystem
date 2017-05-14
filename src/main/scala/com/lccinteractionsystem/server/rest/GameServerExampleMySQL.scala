@@ -116,7 +116,7 @@ class GameInstitutionFactory_mysql(id:String,db_config:String)
   def create_store(id:String): SlickStateStore= {
     val store = new MysqlSlickStateStoreURL(db_config,"host","host")
     System.err.println(s"Creating a new state store for agent $id")
-    store.init //connect to a database and table named "scalsc_states"
+    
     store
   }
 

@@ -14,8 +14,8 @@
 	Now the proposer has decided to offer <?php  sleep(1); echo $proposeroffer;?>. <br>
 	What's your choice?<br><br> 
 
-  <input type="radio" name="responderchoice" value="Accept" >Accept the offer
-  <input type="radio" name="responderchoice" value="Reject" >Reject the offer<br><br>
+  <input type="radio" name="responderchoice" value="accept" >Accept the offer
+  <input type="radio" name="responderchoice" value="reject" >Reject the offer<br><br>
   <input type="submit" name="press" value="I have decided ! "><br><br>	
 
 </form>

@@ -14,7 +14,7 @@
     $secondagent_role="responder({$game_total})";
 
     $proposeroffer="2";
-    $responderchoice="Reject";
+    $responderchoice="reject";
 
   //0.1
   function msgstorecsv($protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody){
