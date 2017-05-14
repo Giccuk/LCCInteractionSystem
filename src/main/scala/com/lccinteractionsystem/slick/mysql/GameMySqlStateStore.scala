@@ -19,8 +19,6 @@ import scala.util.{Failure, Success}
 class GameMySqlSlickStateStoreURL(gamedatabaseurl:String, gameuser:String, gamepassword:String) 
 extends MysqlSlickStateStoreURL(gamedatabaseurl, gameuser, gamepassword,"com.mysql.jdbc.Driver") with SlickStateBackUp{
   
- 
-  
   def createbackuptable={
     val backuptables=List(backuptable)//list of tables used for backuping states
     val existingtables=run(MTable.getTables)//get existing tables in database
@@ -32,11 +30,10 @@ extends MysqlSlickStateStoreURL(gamedatabaseurl, gameuser, gamepassword,"com.mys
     Await.result(createaction,Duration.Inf)
   }
   
-  override def state_terminated(id:StateInfo)= {  
-    val table_backup=copydata(id.comm_id,backuptable.baseTableRow.tableName,table.baseTableRow.tableName)
+  override def state_terminated(id:StateInfo)= { 
+    val table_backup=copydata(id.comm_id,id.role.id.toString,backuptable.baseTableRow.tableName,table.baseTableRow.tableName)
     run_now(table_backup)
-    println("++++++++++@@@@@@@@@@@@@@@+++++++++++++++++=")
-    //remove_state(id)
+    remove_state(id)
   }
    
 }

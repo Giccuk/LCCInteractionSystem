@@ -36,17 +36,18 @@ import com.moseph.scalsc.server._
 import com.moseph.scalsc.slick.mysql._
 import scala.concurrent.duration._
 
+import com.lccinteractionsystem.slick.mysql._
 
 /**
  * Example game server created by DMR that uses a custom state store,
  * and demonstrates what is in it before and after running the protocol
  */
-object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
+object GameServerExampleMySQL_backup extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking{
   
   val dburl="jdbc:mysql://localhost:3306/lccgame"
 
   //Create a game institution factory
-  val gameInstitutin_factory = new GameInstitutionFactory_mysql("gameInstitutin_factory",dburl)
+  val gameInstitutin_factory = new GameInstitutionFactory_mysql_backup("gameInstitutin_factory",dburl)
   
   /***************************************************************************
    * The next few lines are just for testing, and showing what is happening 
@@ -83,7 +84,7 @@ object GameServerExampleMySQL extends InstitutionRESTServer(new ResourceProtocol
 
 
 //An InstitutionFactory that will use the Slick state store
-class GameInstitutionFactory_mysql(id:String,db_config:String) 
+class GameInstitutionFactory_mysql_backup(id:String,db_config:String) 
   extends DefaultInstitutionFactory(id, "Game institution factory that uses Slick to store agent states") { 
   //when it makes an environment factory, make a special one
   override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
@@ -114,8 +115,9 @@ class GameInstitutionFactory_mysql(id:String,db_config:String)
   //This is the function we're going to use for creating a game state store
   //Uses the agent ID just for debugging
   def create_store(id:String): SlickStateStore= {
-    val store = new MysqlSlickStateStoreURL(db_config,"host","host")
+    val store = new GameMySqlSlickStateStoreURL(db_config,"host","host")
     System.err.println(s"Creating a new state store for agent $id")
+    store.createbackuptable//create a new table to back up agent states
     store
   }
 

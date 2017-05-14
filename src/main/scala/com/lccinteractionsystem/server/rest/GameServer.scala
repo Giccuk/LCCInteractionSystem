@@ -36,13 +36,16 @@ import com.moseph.scalsc.environment._
 import com.moseph.scalsc.server._
 import com.moseph.scalsc.slick.mysql.MysqlSlickStateStoreURL
 
+import com.lccinteractionsystem.slick.mysql._
+
 
 
 object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking {
   val console = new StdInInstitutionConsole {}
 
-  def game_statestore: SlickStateStore=new MysqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame")
+  def game_statestore=new GameMySqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame","host","host")
   game_statestore.init
+  game_statestore.createbackuptable
   
   val game_factory = new DefaultInstitutionFactory("game_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
      override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
@@ -63,40 +66,41 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
     
   class GameInstitutionFactory_mysql(id:String,db_config:String) 
   extends DefaultInstitutionFactory(id, "Game institution factory that uses Slick to store agent states") { 
-  //when it makes an environment factory, make a special one
-  override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
-    new SimpleEnvironmentFactory(manager.protocols) {
-      //Handle the creation differently
-      override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] = {
-        val id = spec.agent_id
-        //Debug message
-        System.err.println(s"------------\n Creating environment for $id!\n--------------")
-        try {
-          //Start from the default agent environment
-          val default_environment = super[SimpleEnvironmentFactory].handle(spec,extra) 
-          //Create the store to use
-          val my_store = create_store(id)
-          //make the special environment by swapping in the new special store
-          val my_environment = default_environment map {s => s(my_store)} 
-          System.err.println("Made my environment")
-          //Any other agent debug stuff here
-          System.err.println("DONE\n-----")
-          my_environment
-        } catch {
-          case e:Exception => System.err.println("Couldn't make environment: " + e )
-          throw e
+    //when it makes an environment factory, make a special one
+    override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
+      new SimpleEnvironmentFactory(manager.protocols) {
+        //Handle the creation differently
+        override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] = {
+          val id = spec.agent_id
+          //Debug message
+          System.err.println(s"------------\n Creating environment for $id!\n--------------")
+          try {
+            //Start from the default agent environment
+            val default_environment = super[SimpleEnvironmentFactory].handle(spec,extra) 
+            //Create the store to use
+            val my_store = create_store(id)
+            //make the special environment by swapping in the new special store
+            val my_environment = default_environment map {s => s(my_store)} 
+            System.err.println("Made my environment")
+            //Any other agent debug stuff here
+            System.err.println("DONE\n-----")
+            my_environment
+          } catch {
+            case e:Exception => System.err.println("Couldn't make environment: " + e )
+            throw e
+          }
         }
       }
-    }
 
-  //This is the function we're going to use for creating a game state store
-  //Uses the agent ID just for debugging
-  def create_store(id:String): SlickStateStore= {
-    val store = new MysqlSlickStateStoreURL(db_config,"host","host")
-    System.err.println(s"Creating a new state store for agent $id")
-    store.init //connect to a database and table named "scalsc_states"
-    store
-  }
+      //This is the function we're going to use for creating a game state store
+      //Uses the agent ID just for debugging
+      //Uses the agent ID just for debugging
+      def create_store(id:String): SlickStateStore= {
+        val store = new GameMySqlSlickStateStoreURL(db_config,"host","host")
+        System.err.println(s"Creating a new state store for agent $id")
+        store.createbackuptable//create a new table to back up agent states
+        store
+      }
   }
    
 }
