@@ -59,27 +59,7 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
   manager.start_institution("game_institution",Some("game_factory")).now map console.set_institution
   
   console.run_in_background  
-/*trait SlickStateBackUp {
 
-  class BackUpSlickStates(tag:Tag) extends Table[SlickState](tag,"backup_scalsc_states") {
-    def agent_id = column[String]("AGENT_ID")
-    def comm_id = column[String]("COMM_ID")
-    def role = column[String]("ROLE")
-    def protocol = column[String]("PROTOCOL")
-    def msg_in = column[String]("MSG_IN")
-    def msg_out = column[String]("MSG_OUT")
-    def state = column[String]("STATE")
-    def * = (agent_id,comm_id,role,protocol,msg_in,msg_out,state) <> (SlickState.tupled,SlickState.unapply)
-  } 
-  
-  val backuptable=TableQuery[BackUpSlickStates]
-
-  def copydata(keyinfo:String,keyinfo2:String,newtable_name:String,oldtable_name:String):DBIO[Int]={ 
-    val insertaction:DBIO[Int]=sqlu"INSERT INTO #$newtable_name SELECT * FROM #$oldtable_name WHERE COMM_ID=$keyinfo AND AGENT_ID=$keyinfo2 "
-    return insertaction  
-  }
-  
-}*/
    
 }
 
