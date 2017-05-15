@@ -9,7 +9,7 @@
     $game_total=10;
     $game_rate=3;
 
-    $firstagent_id="ian";
+    $firstagent_id="ellen";
     $firstagent_role="investor({$game_total},{$game_rate})";
 
     $secondagent_id="ted";

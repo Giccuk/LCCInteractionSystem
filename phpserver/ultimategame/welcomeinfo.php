@@ -1,7 +1,7 @@
 <?php
    //before 0.
-    $sourcefiledir="/var/www/html/ilw/game/phpserver";
-    $gameserveraddress="localhost/phpserver";
+    $sourcefiledir="/var/www/html/scalatest/phpserver";
+    $gameserveraddress="rstudio.igmm.ed.ac.uk/scalatest/phpserver";
     $lccengineaddress="localhost:8888";
     $institutionname="game_institution";
     $gameprotocol_id="ultimategame";
