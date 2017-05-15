@@ -54,54 +54,32 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
            super[SimpleEnvironmentFactory].handle(spec,extra) map {s => s(game_statestore)} //make the special environment by swapping in the new special store
        }
   }
-    
-  //Register your factor
+   
   manager.register(game_factory)
-  //Now start an institution that uses your factory by passing in Some(<name of factory>)
   manager.start_institution("game_institution",Some("game_factory")).now map console.set_institution
-
   
   console.run_in_background  
+/*trait SlickStateBackUp {
 
-    
-  class GameInstitutionFactory_mysql(id:String,db_config:String) 
-  extends DefaultInstitutionFactory(id, "Game institution factory that uses Slick to store agent states") { 
-    //when it makes an environment factory, make a special one
-    override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
-      new SimpleEnvironmentFactory(manager.protocols) {
-        //Handle the creation differently
-        override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] = {
-          val id = spec.agent_id
-          //Debug message
-          System.err.println(s"------------\n Creating environment for $id!\n--------------")
-          try {
-            //Start from the default agent environment
-            val default_environment = super[SimpleEnvironmentFactory].handle(spec,extra) 
-            //Create the store to use
-            val my_store = create_store(id)
-            //make the special environment by swapping in the new special store
-            val my_environment = default_environment map {s => s(my_store)} 
-            System.err.println("Made my environment")
-            //Any other agent debug stuff here
-            System.err.println("DONE\n-----")
-            my_environment
-          } catch {
-            case e:Exception => System.err.println("Couldn't make environment: " + e )
-            throw e
-          }
-        }
-      }
+  class BackUpSlickStates(tag:Tag) extends Table[SlickState](tag,"backup_scalsc_states") {
+    def agent_id = column[String]("AGENT_ID")
+    def comm_id = column[String]("COMM_ID")
+    def role = column[String]("ROLE")
+    def protocol = column[String]("PROTOCOL")
+    def msg_in = column[String]("MSG_IN")
+    def msg_out = column[String]("MSG_OUT")
+    def state = column[String]("STATE")
+    def * = (agent_id,comm_id,role,protocol,msg_in,msg_out,state) <> (SlickState.tupled,SlickState.unapply)
+  } 
+  
+  val backuptable=TableQuery[BackUpSlickStates]
 
-      //This is the function we're going to use for creating a game state store
-      //Uses the agent ID just for debugging
-      //Uses the agent ID just for debugging
-      def create_store(id:String): SlickStateStore= {
-        val store = new GameMySqlSlickStateStoreURL(db_config,"host","host")
-        System.err.println(s"Creating a new state store for agent $id")
-        store.createbackuptable//create a new table to back up agent states
-        store
-      }
+  def copydata(keyinfo:String,keyinfo2:String,newtable_name:String,oldtable_name:String):DBIO[Int]={ 
+    val insertaction:DBIO[Int]=sqlu"INSERT INTO #$newtable_name SELECT * FROM #$oldtable_name WHERE COMM_ID=$keyinfo AND AGENT_ID=$keyinfo2 "
+    return insertaction  
   }
+  
+}*/
    
 }
 
