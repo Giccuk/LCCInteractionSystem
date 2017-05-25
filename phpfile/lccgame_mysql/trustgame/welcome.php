@@ -61,7 +61,7 @@
               msgstorecsv("{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer}#{$secondagent_id}))");
 
               //pass interactionid to trusteeside
-              $keydata=array("interid"=>$interactionid_Trusteeside);
+              $keydata=array("interid"=>$interactionid_Trusteeside,"investorchoice"=>$investoroffer);
               $keydata_json=json_encode($keydata);
               $fp=fopen("{$sourcefiledir}/trustgame/trusteeside/trusteeinfo.json",'w');
               fwrite($fp, $keydata_json);

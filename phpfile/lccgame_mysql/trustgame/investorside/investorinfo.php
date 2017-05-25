@@ -15,12 +15,21 @@
 
     $secondagent_id="ted";
     $secondagent_role="trustee($game_rate)";
-
-
-    $investoroffer="4";
-    $trusteerepay="3";
+    
+    $investoroption=range(1,$game_total);
+    $investoroption_rand=array_rand($investoroption);
+    $investoroffer=$investoroption[$investoroption_rand];
 
   //0.1
+  function gettrusteerepay($investorofferamount,$transferrate){     
+    $top=$investorofferamount*$transferrate;
+    $trusteeoption=range(1,$top);
+    $trusteeoption_rand=array_rand($trusteeoption);
+    $trusteerepay=$trusteeoption[$trusteeoption_rand];
+    return $trusteerepay;
+  }
+
+  //0.2
   function msgstorecsv($protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody){
       //$csv_header=array('msgsenderid','msgsenderrole','msgreceiverid','msgreceiverrole','msgbody');
       $inputdata=array($protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody);
@@ -70,10 +79,10 @@
   }
 
   //2.
-  function CreateFirstagent($serverpath,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role){
+  function CreateFirstagent($serverpath,$institutionname,$game_protocolid,$firstagent_id,$firstagent_role){
     $agent=array(
         "template"=>array(
-        "protocol_id"=>$gameprotocol_id,
+        "protocol_id"=>$game_protocolid,
         "agents"=>array(
           array(
             "agent_id"=>$firstagent_id,
@@ -132,28 +141,28 @@
 
   /*----------------0. check whether the server is ready-------------
   echo "0. Check initial state<br><br>";
-  echo getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>';
+  echo getrequest("http://{$localhost_path}/institutions");echo '<br><br>';
 
   /*--------------1. create an institution------------------
   echo "1. Create an institution<br><br>";
-  CreateInstitution($lccengineaddress,$institutionname);
+  CreateInstitution($localhost_path,$institutionname);
   
   /*----------1.1check if the new institution exists
   echo "1.1 Check if institution exists:<br><br>";
-  echo getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>'; 
+  echo getrequest("http://{$localhost_path}/institutions");echo '<br><br>'; 
 
   /*-----------2. Create first agent--------------------
   echo "2. Create first Agent <br><br>";
-  $interactionid=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);
+  $interactionid=CreateFirstagent($localhost_path,$institutionname,$game_protocolid,$firstagent_id,$firstagent_role);
 
   /*---------2.2 check firstagent state---------------
   echo "2.2 Check if firstagent exists<br><br>'";
-  $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid}";
+  $interactionpath="http://{$localhost_path}/interaction/user/manager/{$institutionname}/{$interactionid}";
   var_dump(getrequest($interactionpath));echo"<br><br>";
 
   /*----------3. add second agent----------------
   echo "3. Create second agent<br><br>";
-  CreateOtherAgent($lccengineaddress,$institutionname,$interactionid,$secondagent_id,$secondagent_role);
+  CreateOtherAgent($localhost_path,$institutionname,$interactionid,$secondagent_id,$secondagent_role);
 
   /*------------3.1 check if all agents are created ---------------
   echo "3.1 Check if agents all exist:<br><br>";
@@ -162,7 +171,7 @@
 
   /*------------4. ask for first agent's next step --------------------
   echo "4. Ask for first agent's next_step <br><br>";
-  $firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$firstagent_id);
+  $firstagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid,$firstagent_id);
   var_dump($firstagent_nextstep_1);echo"<br><br>";
 
  /*---get the body of next_step
@@ -175,24 +184,24 @@
 
   /*---------5. answer firstagent---------------
   echo "5. Answer first agnt<br><br>";
-  AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid,$firstagent_id,$firstagent_response_1);
+  AnswerAgentNextStep($localhost_path,$institutionname,$interactionid,$firstagent_id,$firstagent_response_1);
   sleep(1);
 
   /*---------6. get second agnet's nextstep---------------------------------
   echo "6. Get second agnet's next step<br><br>";
-  $secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$secondagent_id);
+  $secondagent_nextstep_1=AskAgentNextStep($localhost_path,$institutionname,$interactionid,$secondagent_id);
   var_dump($secondagent_nextstep_1);echo"<br><br>";
 
   /*--------7. answer second agent--------------------------------
   echo "7. Answer second agent<br><br>";
-  AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid,$secondagent_id,$secondagent_response_1);
+  AnswerAgentNextStep($localhost_path,$institutionname,$interactionid,$secondagent_id,$secondagent_response_1);
   sleep(1);
 
   /*--------8 check next step------------------------
   echo "8. Check next step<br><br>";
-  $out_json=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$firstagent_id);
+  $out_json=AskAgentNextStep($localhost_path,$institutionname,$interactionid,$firstagent_id);
   sleep(1);
-  $out_json2=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$secondagent_id);
+  $out_json2=AskAgentNextStep($localhost_path,$institutionname,$interactionid,$secondagent_id);
   sleep(1);
   var_dump($out_json);echo"<br><br>";
   var_dump($out_json2);echo"<br><br>";

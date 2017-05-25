@@ -6,10 +6,15 @@
 <body>
 <?php 
   include 'trusteeinfo.php';
-  $trusteegetNum=$game_rate*$investoroffer;
+  $fp=fopen('trusteeinfo.json','r');
+  $interiddata_json=fread($fp,filesize('trusteeinfo.json'));
+  fclose($fp);
+  $interiddata=json_decode($interiddata_json,true);
+  $investorchoice=$interiddata["investorchoice"];
+  $trusteegetNum=$game_rate*$investorchoice;
 ?>
 
-<p>You are now the trustee. The investor has decided to offer <?php  sleep(1); echo $investoroffer;?> to you. So you have <?php echo $trusteegetNum; ?>. How much will you repay?</p>
+<p>You are now the trustee. The investor has decided to offer <?php  sleep(1); echo $investorchoice;?> to you. So you have <?php echo $trusteegetNum; ?>. How much will you repay?</p>
 <span style="color: #FF0000;">*Please enter the number smaller than <?php echo $trusteegetNum;?> !</span><br><br>
 
 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">

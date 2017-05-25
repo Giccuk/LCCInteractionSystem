@@ -10,17 +10,17 @@
 
     include 'gamecommands.php';
     echo "0. Check initial state<br><br>";
-    $defaultstate_json=getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>';
+    $defaultstate_json=getrequest("http://{$localhost_path}/institutions");echo '<br><br>';
     $defaultstate=json_decode($defaultstate_json,true);
     $subject=$defaultstate["0"]["path"];
-    $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
+    $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
     preg_match($pattern,$subject,$matches);
     if ($matches[1]=="default"){
       echo "1. Create an institution<br><br>";
-      $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
+      $institutionstate_json=CreateInstitution($localhost_path,$institutionname);
       $institutionstate=json_decode($institutionstate_json,true);
       $subject=$institutionstate["path"];
-      $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
+      $pattern="/http:\/\/{$localhost_path}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
       if ($matches[1]==$institutionname){
         echo "New institution exists<br><br>";

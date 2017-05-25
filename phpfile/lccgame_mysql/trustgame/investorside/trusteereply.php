@@ -39,6 +39,7 @@
 
             //$secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id);
 
+            $trusteerepay=gettrusteerepay($_POST["investoroffer"],$game_rate);
             $secondagent_response_1="e(repay({$trusteerepay}, {$firstagent_id}), _)";
             AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id,$secondagent_response_1);
             sleep(1);
