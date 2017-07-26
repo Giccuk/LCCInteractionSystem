@@ -36,7 +36,6 @@ import com.moseph.scalsc.server._
 import com.moseph.scalsc.slick.mysql._
 import scala.concurrent.duration._
 
-
 /**
  * Example game server created by DMR that uses a custom state store,
  * and demonstrates what is in it before and after running the protocol
