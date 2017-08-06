@@ -32,3 +32,7 @@ cd /path/stores/project/LCCInteractionSystem
 ```shell
 python stopengine.sh
 ```
+
+---
+
+[Ref](https://www.evernote.com/shard/s495/sh/55efe3a1-fa3a-4668-96cf-990a6a68aac5/ae38b33d2226e4d668a9f143bfcfd563)
