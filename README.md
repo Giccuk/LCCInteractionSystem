@@ -16,11 +16,6 @@ cd /path/stores/project/LCCInteractionSystem
 ```
 3. Go to game pages
 
-- simple version
-```URL
-localhost/phpfile/ultimategame/welcome.php
-```
-- MySQL version
 ```URL
 localhost/lccgame_mysql/ultimategame/welcome.php
 ```
