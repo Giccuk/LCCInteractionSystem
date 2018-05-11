@@ -39,11 +39,10 @@ import com.moseph.scalsc.slick.mysql.MysqlSlickStateStoreURL
 import com.lccinteractionsystem.slick.mysql._
 
 
-
 object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking {
   val console = new StdInInstitutionConsole {}
 
-  def game_statestore=new GameMySqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame","host","host")
+  def game_statestore=new GameMySqlSlickStateStoreURL("jdbc:mysql://localhost:3306/lccgame?useSSL=false","host","host")
   game_statestore.init
   game_statestore.createbackuptable
   
@@ -52,7 +51,7 @@ object GameServer extends InstitutionRESTServer(new ResourceProtocolStore("/phpg
        new SimpleEnvironmentFactory(manager.protocols) {//When you create an agent environment, make a special one
          override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] =
            super[SimpleEnvironmentFactory].handle(spec,extra) map {s => s(game_statestore)} //make the special environment by swapping in the new special store
-       }
+       } 
   }
    
   manager.register(game_factory)
