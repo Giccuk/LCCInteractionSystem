@@ -26,14 +26,16 @@ extends MysqlSlickStateStoreURL(gamedatabaseurl, gameuser, gamepassword,"com.mys
       val names=v.map(mt=>mt.name.name)
       val createIfNoExit=backuptables.filter(t =>(!names.contains(t.baseTableRow.tableName))).map(_.schema.create)
       run(DBIO.sequence(createIfNoExit))
-    })   
+    })
     Await.result(createaction,Duration.Inf)
   }
   
   override def state_terminated(id:StateInfo)= { 
     val table_backup=copydata(id.comm_id,id.role.id.toString,backuptable.baseTableRow.tableName,table.baseTableRow.tableName)
     run_now(table_backup)
+    print("+++++++++++++++++++++++++++++ table_backup")
     remove_state(id)
+    print("+++++++++++++++++++++++++++++ remove state")
   }
    
 }
