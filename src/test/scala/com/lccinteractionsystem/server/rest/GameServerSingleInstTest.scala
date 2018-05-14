@@ -16,8 +16,8 @@ import org.json4s._
  * Example server operation with JSON. Test class shows the JSON sent (for POST/PUT requests)
  * and the JSON expected after some of the creations
  */
-class GameServerDefaultInstTest extends FeatureTest with Mockito {
-  val server = new EmbeddedHttpServer(new GameServer_newinstitution("jdbc:mysql://localhost:3306/lccgame_test"))
+class GameServerSingleInstTest extends FeatureTest with Mockito {
+  val server = new EmbeddedHttpServer(new GameServer("jdbc:mysql://localhost:3306/lccgame_test"))
   implicit val formats = DefaultFormats
   
   "Server Setup" in {
