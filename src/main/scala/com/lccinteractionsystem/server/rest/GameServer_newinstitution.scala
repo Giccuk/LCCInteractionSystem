@@ -18,9 +18,9 @@ import com.moseph.scalsc.server._
 import com.lccinteractionsystem.slick.mysql._
 
 
-object GameServerRunner extends GameServer_fix
+object GameServerRunner extends GameServer_newinstitution
 
-class GameServer_fix(url:String="jdbc:mysql://localhost:3306/lccgame_test",user:String="host",password:String="host") extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking {
+class GameServer_newinstitution(url:String="jdbc:mysql://localhost:3306/lccgame_test",user:String="host",password:String="host") extends InstitutionRESTServer(new ResourceProtocolStore("/phpgameprotocols")) with Asking {
   val console = new StdInInstitutionConsole {}
 
   def game_statestore=new GameMySqlSlickStateStoreURL(url,user,password)
