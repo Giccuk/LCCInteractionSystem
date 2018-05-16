@@ -40,6 +40,9 @@ class GameServerMultiInstTest extends FeatureTest with Mockito {
     
     )
     
+
+    
+    
     //1.Should start with a game_institution
     server.httpGet(
         path="/institutions",
@@ -72,19 +75,19 @@ class GameServerMultiInstTest extends FeatureTest with Mockito {
     val inter_resp = server.httpPost(
         path=s"/institution/create/user/manager/$institutionname",
         postBody = """
-{  
-  "template":{  
-    "protocol_id":"trustgame_simple",
-    "agents":[  {  
-        "agent_id":"agent11",
-        "roles":[  {  "role":"investor(10,3)" } ]
-      } ]
-  },
-  "data":{  }
-}
+          {  
+            "template":{  
+              "protocol_id":"trustgame_simple",
+              "agents":[  {  
+                "agent_id":"agent1",
+                "roles":[  {  "role":"investor(10,4)" } ]
+              } ]
+            },
+            "data":{}
+          }
           """,
         andExpect = Ok
-        )
+  )
 
         /** Now do some work to get the interaction ID so we can use it **/ 
     val institution_path = s"http://localhost:8888/interaction/user/manager/$institutionname/"
@@ -94,8 +97,8 @@ class GameServerMultiInstTest extends FeatureTest with Mockito {
     val interaction_id = interaction_path.replaceFirst(institution_path,"")
     interaction_id should startWith("int")
     
-    val agent11path = s"http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent11"
-    val agent21path = s"http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent21"
+    val agent1path = s"http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent1"
+    val agent2path = s"http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent2"
     
     //Check that the interaction is there
     server.httpGet(
@@ -108,37 +111,24 @@ class GameServerMultiInstTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent11"
+                "path" : "http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent1"
               }
             ]
           }
           """
         )
     
-    System.err.println(s"Checking agent: $agent11path")
+    System.err.println(s"Checking agent: $agent1path")
     Thread.sleep(1000)
-     //Check that the agent is in the right state
-    server.httpGet(
-        path=agent11path,
-        andExpect = Ok,
-        withJsonBody = s"""
-{
-    "type": "agent",
-    "path": "$agent11path",
-    "next_steps": [ "e(invest(X, T), _)" ]
-}
-          """
-        ) 
-        
-        
+            
      //5. Make a new agent in the interaction
      server.httpPost(
          path=s"http://localhost:8888/interaction/create/user/manager/$institutionname/$interaction_id",
          postBody = """
 {  
   "template":{  
-    "agent_id":"agent21",
-    "roles":[  {  "role":"trustee(3)" } ]
+    "agent_id":"agent2",
+    "roles":[  {  "role":"trustee(4)" } ]
   },
   "data":{  }
 }
@@ -147,7 +137,7 @@ class GameServerMultiInstTest extends FeatureTest with Mockito {
          withJsonBody = s"""
            {
              "type" : "agent",
-             "path":"$agent21path"
+             "path":"$agent2path"
            }
            """
          )
@@ -162,11 +152,11 @@ class GameServerMultiInstTest extends FeatureTest with Mockito {
             "agents" : [
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent11"
+                "path" : "http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent1"
               },
               {
                 "type" : "agent",
-                "path" : "http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent21"
+                "path" : "http://localhost:8888/agent/user/manager/$institutionname/$interaction_id/agent2"
               }
             ]
           }
@@ -175,16 +165,48 @@ class GameServerMultiInstTest extends FeatureTest with Mockito {
     Thread.sleep(1000)
     
     server.httpGet(
-        path=agent11path,
+        path=agent1path,
         andExpect = Ok,
         withJsonBody = s"""
-{
-    "type": "agent",
-    "path": "$agent11path",
-    "next_steps": [ "e(invest(X, T), _)" ]
-}
-          """
-        ) 
+        {
+          "type": "agent",
+          "path": "$agent1path",
+          "next_steps": [ "e(invest(X, T), _)" ]
+        }"""
+        )
+
+     /*server.httpPost(
+         path=s"http://localhost:8888/agent/elicited/user/manager/$institutionname/$interaction_id/agent1",
+         postBody="""{"elicited":"e(invest(4, agent2), _)"}""",
+         andExpect = Ok,
+         withJsonBody = s"""
+           {
+             "type" : "agent",
+             "path":"$agent1path"
+           }
+           """
+         )*/
+    
+     server.httpPost(
+         path=s"http://localhost:8888/agent/elicited/user/manager/$institutionname/$interaction_id/agent1",
+         postBody="""{"elicited":"e(invest(5, agent2), _)"}"""     
+         )
+         
+    server.httpGet(
+        path=agent2path,
+        andExpect = Ok,
+        withJsonBody = s"""
+        {
+          "type": "agent",
+          "path": "$agent2path",
+          "next_steps": [ "e(repay(Y, agent1), _)" ]
+        }"""
+        )
+        
+    server.httpPost(
+         path=s"http://localhost:8888/agent/elicited/user/manager/$institutionname/$interaction_id/agent2",
+         postBody="""{"elicited":"e(repay(7, agent1), _)"}"""
+         )
     
   }
 }

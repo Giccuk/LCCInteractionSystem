@@ -18,6 +18,7 @@ import org.json4s._
  */
 class GameServerSingleInstTest extends FeatureTest with Mockito {
   val server = new EmbeddedHttpServer(new GameServer("jdbc:mysql://localhost:3306/lccgame_test"))
+  
   implicit val formats = DefaultFormats
   
   "Server Setup" in {
@@ -30,8 +31,10 @@ class GameServerSingleInstTest extends FeatureTest with Mockito {
      * The GameServer sets up the institution automatically, so we should find one
      */
     
-    //1.Should start with a game_institution
+    //0.
     val institutionname="game_institution"
+    
+    //1.Should start with a game_institution
     server.httpGet(
         path="/institutions",
         andExpect = Ok,
@@ -60,19 +63,19 @@ class GameServerSingleInstTest extends FeatureTest with Mockito {
     val inter_resp = server.httpPost(
         path=s"/institution/create/user/manager/$institutionname",
         postBody = """
-{  
-  "template":{  
-    "protocol_id":"trustgame_simple",
-    "agents":[  {  
-        "agent_id":"agent1",
-        "roles":[  {  "role":"investor(10,4)" } ]
-      } ]
-  },
-  "data":{  }
-}
+          {  
+            "template":{  
+              "protocol_id":"trustgame_simple",
+              "agents":[  {  
+                "agent_id":"agent1",
+                "roles":[  {  "role":"investor(10,4)" } ]
+              } ]
+            },
+            "data":{}
+          }
           """,
         andExpect = Ok
-        )
+  )
 
         /** Now do some work to get the interaction ID so we can use it **/ 
     val institution_path = s"http://localhost:8888/interaction/user/manager/$institutionname/"
@@ -105,20 +108,7 @@ class GameServerSingleInstTest extends FeatureTest with Mockito {
     
     System.err.println(s"Checking agent: $agent1path")
     Thread.sleep(1000)
-     //Check that the agent is in the right state
-    server.httpGet(
-        path=agent1path,
-        andExpect = Ok,
-        withJsonBody = s"""
-{
-    "type": "agent",
-    "path": "$agent1path",
-    "next_steps": [ "e(invest(X, T), _)" ]
-}
-          """
-        ) 
-        
-        
+            
      //5. Make a new agent in the interaction
      server.httpPost(
          path=s"http://localhost:8888/interaction/create/user/manager/$institutionname/$interaction_id",
@@ -159,20 +149,45 @@ class GameServerSingleInstTest extends FeatureTest with Mockito {
             ]
           }
           """
-        )      
+        )   
+       
     Thread.sleep(1000)
     
     server.httpGet(
         path=agent1path,
         andExpect = Ok,
         withJsonBody = s"""
-{
-    "type": "agent",
-    "path": "$agent1path",
-    "next_steps": [ "e(invest(X, T), _)" ]
-}
-          """
-        ) 
+        {
+          "type": "agent",
+          "path": "$agent1path",
+          "next_steps": [ "e(invest(X, T), _)" ]
+        }"""
+        )
+
     
+    server.httpPost(
+         path=s"http://localhost:8888/agent/elicited/user/manager/$institutionname/$interaction_id/agent1",
+         postBody="""{"elicited":"e(invest(5, agent2), _)"}"""     
+         )
+         
+   server.httpGet(
+        path=agent2path,
+        andExpect = Ok,
+        withJsonBody = s"""
+        {
+          "type": "agent",
+          "path": "$agent2path",
+          "next_steps": [ "e(repay(Y, agent1), _)" ]
+        }"""
+        )
+        
+    server.httpPost(
+         path=s"http://localhost:8888/agent/elicited/user/manager/$institutionname/$interaction_id/agent2",
+         postBody="""{"elicited":"e(repay(7, agent1), _)"}"""
+         )
+         
   }
+  
+  
+
 }
