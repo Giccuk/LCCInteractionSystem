@@ -27,7 +27,7 @@ class GameServer(url:String="jdbc:mysql://localhost:3306/lccgame_test",user:Stri
   game_statestore.init
   game_statestore.createbackuptable
   
-  val game_factory = new DefaultInstitutionFactory("game_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
+  val lccgame_factory = new DefaultInstitutionFactory("lccgame_factory","Game institution factory that uses Slick to store agent states") { //when it makes an environment factory, make a special one
      override def get_environment_factory(d:DefaultInstitutionDef) : EnvironmentFactory =
        new SimpleEnvironmentFactory(manager.protocols) {//When you create an agent environment, make a special one
          override def handle(spec:AgentSpec,extra:Any) : Option[EnvironmentBuilder] =
@@ -35,8 +35,8 @@ class GameServer(url:String="jdbc:mysql://localhost:3306/lccgame_test",user:Stri
        }
   }
    
-  manager.register(game_factory)
-  manager.start_institution("game_institution",Some("game_factory")).now map console.set_institution
+  manager.register(lccgame_factory)
+  manager.start_institution("game_institution",Some("lccgame_factory")).now map console.set_institution
   
   console.run_in_background  
 
